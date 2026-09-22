@@ -4,7 +4,8 @@
 
 一块块搭起，一步步完成。
 
-> 当前版本：0.12.6 候选版。macOS 已完成隔离安装验证；Windows、Linux 尚未完成实机验收。
+<img width="2400" height="1200" alt="image" src="https://github.com/user-attachments/assets/a690d8a5-0ed3-401e-9e5c-93148a2cbcd7" />
+
 
 ## 让产品评审，直接进入下一轮修改
 
