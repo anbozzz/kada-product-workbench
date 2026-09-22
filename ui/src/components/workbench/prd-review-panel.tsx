@@ -1,5 +1,6 @@
+import { buildRevisionDiff, type DiffRow } from "@/lib/prd-revision-diff"
 import { setRuntimeDirty } from "@/components/runtime/runtime-state"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ArrowUp, Check, X } from "lucide-react"
 import { Dialog } from "radix-ui"
 import { Button } from "@/components/ui/button"
@@ -234,18 +235,36 @@ export function PrdReviewPanel({ review, selection, onClearSelection, onLocate, 
   )
 }
 
-// Exact common prefix/suffix; the changed span deliberately stays contiguous.
-// Unlike quadratic LCS this remains bounded for large PRDs and never omits changed lines.
+function RevisionRows({ rows }: { rows: DiffRow[] }) {
+  return <div className="font-mono text-xs leading-6">{rows.map((row, index) => <div key={index} data-diff-kind={row.kind} className="flex items-start gap-2 px-3">
+    <span className="w-9 shrink-0 select-none text-right text-muted-foreground" aria-label="上一版行号">{row.oldLine ?? ""}</span>
+    <span className="w-9 shrink-0 select-none text-right text-muted-foreground" aria-label="当前版行号">{row.newLine ?? ""}</span>
+    <span className={`w-3 shrink-0 ${row.kind === "removed" ? "text-red-300" : row.kind === "added" ? "text-emerald-300" : "text-muted-foreground"}`}>{row.kind === "removed" ? "−" : row.kind === "added" ? "+" : " "}</span>
+    <span className="min-w-0 flex-1 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">{row.kind === "equal" ? row.text || " " : (row.parts ?? [{ text: row.text || " ", changed: true }]).map((part, partIndex) => part.changed
+      ? <mark key={partIndex} className={row.kind === "removed" ? "bg-red-400/20 text-red-200" : "bg-emerald-400/20 text-emerald-200"}>{part.text}</mark>
+      : <span key={partIndex}>{part.text}</span>)}</span>
+  </div>)}</div>
+}
+
 export function PrdRevisionDiff({ before, after }: { before: string; after: string }) {
-  const oldLines = before.split(/\r?\n/), newLines = after.split(/\r?\n/)
-  let start = 0, end = 0
-  while (start < oldLines.length && start < newLines.length && oldLines[start] === newLines[start]) start++
-  while (end < oldLines.length - start && end < newLines.length - start && oldLines[oldLines.length - end - 1] === newLines[newLines.length - end - 1]) end++
-  return <div data-testid="prd-revision-diff" className="p-5 text-xs">
-    <p className="mb-3 text-muted-foreground">红色为上一版，绿色为当前版。展示首尾变化之间的完整区段；未变化的头尾已省略。</p>
-    {before === after ? <p>本批未修改正文，请查看修订说明。</p> : <div className="space-y-3 font-mono">
-      <pre className="overflow-x-auto whitespace-pre-wrap rounded bg-red-400/10 p-3 text-red-200">{oldLines.slice(start, oldLines.length - end).map((line, index) => `− ${start + index + 1}  ${line}`).join("\n") || "（无删除）"}</pre>
-      <pre className="overflow-x-auto whitespace-pre-wrap rounded bg-emerald-400/10 p-3 text-emerald-200">{newLines.slice(start, newLines.length - end).map((line, index) => `+ ${start + index + 1}  ${line}`).join("\n") || "（无新增）"}</pre>
-    </div>}
+  const { sections, limited } = useMemo(() => buildRevisionDiff(before, after), [before, after])
+  const count = sections.filter(section => section.kind === "change").length
+  return <div data-testid="prd-revision-diff" className="space-y-3 p-5 text-xs">
+    {limited ? <>
+      <p role="status">本轮变化较大，暂未完成精确分块。以下保留两版原文供核对；可返回“正文”阅读当前版。</p>
+      <details><summary className="cursor-pointer">上一版原文</summary><pre className="whitespace-pre-wrap break-words">{before}</pre></details>
+      <details><summary className="cursor-pointer">当前版原文</summary><pre className="whitespace-pre-wrap break-words">{after}</pre></details>
+    </> : count === 0 ? <p>本批未修改正文，请查看修订说明。</p> : <>
+      <p className="leading-5 text-muted-foreground">共 {count} 个变化区段。红色 − 为删除，绿色 + 为新增；每处保留前后两行，未改内容可展开。行号依次为上一版、当前版。</p>
+      {sections.map((section, index) => section.kind === "gap"
+        ? <details key={index} data-testid="prd-diff-gap" className="rounded-lg border border-border/50 py-2">
+          <summary className="cursor-pointer px-3 text-muted-foreground">未修改的 {section.rows.length} 行（展开／收起）</summary>
+          <RevisionRows rows={section.rows} />
+        </details>
+        : <section key={index} data-testid="prd-diff-hunk" className="overflow-hidden rounded-lg border border-border/70 py-2">
+          <h3 className="mb-2 border-b border-border/50 px-3 pb-2 font-medium">{section.heading}</h3>
+          <RevisionRows rows={section.rows} />
+        </section>)}
+    </>}
   </div>
 }

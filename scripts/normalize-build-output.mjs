@@ -6,6 +6,10 @@ await copyFile(
   resolve(import.meta.dirname, '..', 'ui/src/components/beautiful-ui/LICENSE'),
   resolve(webRoot, 'LICENSE.beautiful-ui.txt'),
 );
+await copyFile(
+  resolve(import.meta.dirname, '..', 'ui/node_modules/diff/LICENSE'),
+  resolve(webRoot, 'LICENSE.diff.txt'),
+);
 const files = [resolve(webRoot, 'index.html')];
 for (const name of await readdir(resolve(webRoot, 'assets'))) {
   if (/\.(?:css|js)$/.test(name)) files.push(resolve(webRoot, 'assets', name));

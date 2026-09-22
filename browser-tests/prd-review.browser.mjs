@@ -255,7 +255,7 @@ try {
   await page.getByText('批次历史 · 1', { exact: true }).click();
   await page.getByRole('button', { name: '继续编辑', exact: true }).click();
   await page.getByTestId('prd-reference-card').getByText('下一批补充意见', { exact: true }).waitFor();
-  const updated = source.replace('帮助用户创建**新的任务**。', '帮助用户批量创建新的任务。');
+  const updated = source.replace('> 适用版本：v0.1', '> 适用版本：v0.2').replace('帮助用户创建**新的任务**。', '帮助用户批量创建新的任务。').replace('保留已创建任务。', '保留全部已创建任务。');
   // Simulate only the original agent's file write, not browser-side writing.
   await writeFile(prdPath, updated);
   const { document } = await readPrdDocument(prdPath);
@@ -270,7 +270,21 @@ try {
   await page.getByTestId('prd-stale-draft').waitFor({ state: 'hidden' });
   await page.getByRole('button', { name: '移除引用 1', exact: true }).click();
   await page.getByRole('button', { name: '上轮修订差异' }).click();
-  await page.getByTestId('prd-revision-diff').getByText(/帮助用户批量创建新的任务/).waitFor();
+  const diff = page.getByTestId('prd-revision-diff');
+  await diff.getByText('帮助用户批量创建新的任务。', { exact: true }).waitFor();
+  assert.equal(await page.getByTestId('prd-diff-hunk').count(), 3, 'distant edits including metadata and outside annotations stay visible in separate hunks');
+  assert.equal(await diff.locator('[data-diff-kind="added"] mark').filter({ hasText: '批量' }).count(), 1);
+  assert.equal(await diff.locator('[data-diff-kind="added"] mark').filter({ hasText: '全部' }).count(), 1);
+  const gap = page.getByTestId('prd-diff-gap').filter({ hasText: '帮助团队管理任务。' });
+  assert.equal(await gap.getByText('帮助团队管理任务。', { exact: true }).isVisible(), false);
+  await gap.locator('summary').click();
+  await gap.getByText('帮助团队管理任务。', { exact: true }).waitFor();
+  assert.equal(await gap.locator('[data-diff-kind="added"], [data-diff-kind="removed"]').count(), 0);
+  await gap.locator('summary').click();
+  assert.equal(await gap.getByText('帮助团队管理任务。', { exact: true }).isVisible(), false);
+  await page.setViewportSize({ width: 780, height: 760 });
+  assert.equal(await diff.evaluate(el => el.scrollWidth <= el.clientWidth), true, 'diff fits narrow drawer');
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: join(screenshotRoot, 'prd-review-diff.png') });
   await page.getByRole('button', { name: '新版全文', exact: true }).click();
   await page.getByTestId('prd-document').getByText('帮助用户批量创建新的任务。', { exact: true }).waitFor();
