@@ -1,0 +1,94 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { launchHeadlessBrowser } from './browser-runtime.mjs';
+import { source } from '../tests/fixtures/prd-review.mjs';
+const appRoot = process.env.IPS_TEST_PLUGIN_ROOT || resolve(import.meta.dirname, '..');
+const { createPrdReviewMcp } = await import(pathToFileURL(join(appRoot, 'src/prd-review-mcp.mjs')));
+const projectPath = await mkdtemp(join(tmpdir(), 'ips-exact-selection-'));
+const prdPath = join(projectPath, 'PRD.md');
+await writeFile(prdPath, source.replace('帮助用户创建**新的任务**。', '帮助用户创建**新的任务**，再创建新的任务。'));
+const manager = createPrdReviewMcp({ statePath: join(projectPath, '.state/projects.json') });
+const opened = await manager.call('open_prd_review', { projectPath, prdPath });
+const browser = await launchHeadlessBrowser();
+try {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await page.goto(opened.url);
+  await page.getByTestId('prd-review-panel').waitFor();
+  const receiver = page.getByTestId('prd-receiver-status');
+  await receiver.locator('[class*="text-amber-300"]').getByText('接收未就绪', { exact: true }).waitFor();
+  const controller = new AbortController();
+  const waiting = manager.call('wait_prd_feedback', { sessionId: opened.sessionId }, { signal: controller.signal }).catch(error => { assert.equal(error.name, 'AbortError'); });
+  await page.locator('[data-testid="prd-receiver-status"][data-connected="true"]').waitFor();
+  await receiver.locator('[class*="text-emerald-300"]').getByText('接收已就绪', { exact: true }).waitFor();
+  controller.abort(); await waiting;
+  await page.locator('[data-testid="prd-receiver-status"][data-connected="false"]').waitFor();
+
+  const passage = page.getByTestId('prd-document').getByText('帮助用户创建新的任务，再创建新的任务。', { exact: true });
+  const select = async (quote, occurrence = 0) => {
+    await passage.scrollIntoViewIfNeeded();
+    await passage.evaluate((element, { quote, occurrence }) => {
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT), nodes = [];
+      let node, text = '';
+      while ((node = walker.nextNode())) { nodes.push({ node, start: text.length }); text += node.textContent; }
+      let start = text.indexOf(quote);
+      for (let i = 0; i < occurrence; i++) start = text.indexOf(quote, start + 1);
+      const first = nodes.findLast(item => item.start <= start), last = nodes.findLast(item => item.start < start + quote.length);
+      const range = document.createRange(); range.setStart(first.node, start - first.start); range.setEnd(last.node, start + quote.length - last.start);
+      window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+      element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+    }, { quote, occurrence });
+    await page.getByRole('textbox', { name: '选区评价', exact: true }).waitFor();
+  };
+  const add = async comment => {
+    const input = page.getByRole('textbox', { name: '选区评价', exact: true });
+    await input.fill(comment); await input.press('Enter');
+    await page.getByTestId('prd-selection-popover').waitFor({ state: 'hidden' });
+  };
+  const ranges = () => page.evaluate(() => [...(CSS.highlights.get('prd-annotations') || [])].map(range => ({ text: range.toString(), start: range.startOffset, container: range.startContainer.textContent })));
+  await select('创建新的'); await add('跨粗体的备注');
+  await page.waitForFunction(() => [...(CSS.highlights.get('prd-annotations') || [])].some(range => range.toString() === '创建新的'));
+  assert.deepEqual((await ranges()).map(item => item.text), ['创建新的']);
+  assert.equal(await passage.getAttribute('title'), null);
+  assert.equal(await page.locator('[data-prd-annotation-count]').count(), 0);
+  await select('新的任务', 1); await add('只属于第二处的备注');
+  await page.waitForFunction(() => CSS.highlights.get('prd-annotations')?.size === 2);
+  assert.equal((await ranges())[1].container, '，再创建新的任务。');
+  assert.equal((await ranges())[1].text, '新的任务');
+  const hoverSecond = async () => {
+    await passage.scrollIntoViewIfNeeded();
+    const point = await page.evaluate(() => { window.getSelection().removeAllRanges(); const range = [...CSS.highlights.get('prd-annotations')][1]; const rect = range.getClientRects()[0]; return { x: rect.left + 2, y: rect.top + rect.height / 2 }; });
+    await page.mouse.move(point.x, point.y);
+  };
+  await hoverSecond();
+  await page.getByRole('tooltip').getByText('只属于第二处的备注', { exact: true }).waitFor();
+  const outside = await passage.evaluate(element => { const range = document.createRange(); range.setStart(element.firstChild, 0); range.setEnd(element.firstChild, 2); const rect = range.getBoundingClientRect(); return { x: rect.left + 1, y: rect.top + rect.height / 2 }; });
+  await page.mouse.move(outside.x, outside.y);
+  await page.getByRole('tooltip').waitFor({ state: 'hidden' });
+  await page.getByRole('button', { name: '预览引用 2', exact: true }).click();
+  await page.getByRole('textbox', { name: '编辑已有意见' }).fill('修改后的备注');
+  await page.keyboard.press('Escape');
+  await hoverSecond(); await page.getByRole('tooltip').getByText('修改后的备注', { exact: true }).waitFor();
+  await page.reload(); await passage.waitFor();
+  await page.waitForFunction(() => CSS.highlights.get('prd-annotations')?.size === 2);
+  assert.equal((await ranges())[1].container, '，再创建新的任务。');
+  await hoverSecond(); await page.getByRole('tooltip').getByText('修改后的备注', { exact: true }).waitFor();
+  await page.getByPlaceholder('搜索章节和正文').fill('新的任务');
+  await page.locator('mark.prd-search-match').first().waitFor();
+  await page.waitForFunction(() => [...(CSS.highlights.get('prd-annotations') || [])].some(range => range.toString() === '新的任务'));
+  await page.getByRole('button', { name: '清空搜索', exact: true }).click();
+  await page.waitForFunction(() => CSS.highlights.get('prd-annotations')?.size === 2);
+  await hoverSecond(); await page.getByRole('tooltip').getByText('修改后的备注', { exact: true }).waitFor();
+  await page.getByRole('button', { name: '发送给原 Codex 任务', exact: true }).click();
+  await page.locator('[data-status="queued"]').waitFor();
+  await page.waitForFunction(() => CSS.highlights.get('prd-annotations')?.size === 2);
+  const feedback = await manager.call('wait_prd_feedback', { sessionId: opened.sessionId, timeoutMs: 0 });
+  assert.equal(feedback.batch.annotations[1].anchor.quoteOccurrence, 1);
+  assert.equal(feedback.batch.annotations[1].anchor.quote, '新的任务');
+  assert.equal(feedback.batch.annotations[1].comment, '修改后的备注');
+  assert.deepEqual(errors, []);
+  console.log('精确选区、跨粗体、重复文字、悬停备注/移开隐藏、编辑、刷新、发送后回显通过');
+} finally { await browser.close(); await manager.close(); await rm(projectPath, { recursive: true, force: true }); }

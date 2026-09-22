@@ -1,0 +1,4 @@
+interface:
+  display_name: "产品文档"
+  short_description: "维护 PRD 与派生 Spec，接续独立架构、手改同步及工作台"
+  default_prompt: "使用 $product-documentation 按本次范围维护 PRD、引用独立架构并派生 Spec；手改先记录差异再回源同步，并按授权接续评审、HTML 文档同步或工作台；仅转换时保持只读。"

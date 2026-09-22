@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagram Design"
+  short_description: "创建编辑级流程图、时序图、状态图、架构图与数据关系图"
+  default_prompt: "Use $diagram-design to turn the supported facts into an editorial, accessible diagram while preserving the workplace Project, coverage, and source contracts."

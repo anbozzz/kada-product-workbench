@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文 PRD 可读性编辑"
+  short_description: "按完整操作整理中文 PRD，保留业务分支、语义和工作台标识"
+  default_prompt: "使用 $prd-concise-cn 原位改善当前 PRD 的可读性，保留完整设计，补明能从正文唯一还原的省略，并按任务授权处理发现的设计缺口。"

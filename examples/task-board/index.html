@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>山径任务看板</title>
+  <style>
+    :root { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #16251e; background: #edf0eb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 0; min-height: 100vh; overflow-x: hidden; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 24px 30px 18px; }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: #fff; background: #285f49; font-weight: 900; }
+    h1 { margin: 0; font-size: 20px; }
+    .brand p { margin: 3px 0 0; color: #6b7771; font-size: 11px; }
+    button { border: 0; font: inherit; cursor: pointer; }
+    .new-task { padding: 10px 15px; border-radius: 9px; color: #fff; background: #285f49; font-size: 12px; font-weight: 750; }
+    main { padding: 0 30px 30px; }
+    .summary { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid #d9ddd7; border-radius: 12px; background: #fff; }
+    .summary strong { font-size: 13px; }
+    .summary span { margin-left: 7px; color: #738078; font-size: 11px; }
+    .filter { padding: 7px 10px; border: 1px solid #d4d9d3; border-radius: 8px; color: #45544c; background: #f8faf7; font-size: 11px; }
+    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 16px; }
+    .column { min-height: 420px; padding: 13px; border: 1px solid #d9ddd7; border-radius: 13px; background: rgba(255,255,255,.64); }
+    .column-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+    .column h2 { margin: 0; font-size: 13px; }
+    .count { min-width: 22px; padding: 3px 6px; border-radius: 999px; text-align: center; color: #526159; background: #e2e7e1; font-size: 10px; }
+    .task { padding: 14px; border: 1px solid #dde1dc; border-radius: 11px; background: #fff; box-shadow: 0 8px 20px rgba(34,51,42,.06); }
+    .task + .task { margin-top: 9px; }
+    .task p { margin: 0; font-size: 12px; font-weight: 700; }
+    .meta { display: flex; justify-content: space-between; margin-top: 13px; color: #7b857f; font-size: 9px; }
+    .tag { padding: 3px 6px; border-radius: 5px; color: #80521d; background: #fff0d8; }
+    .complete { width: 100%; margin-top: 12px; padding: 7px 9px; border-radius: 7px; color: #285f49; background: #e5f1eb; font-size: 10px; font-weight: 750; }
+    .empty { padding: 35px 10px; color: #8a948e; text-align: center; font-size: 11px; }
+    dialog { width: 360px; border: 0; border-radius: 14px; padding: 22px; box-shadow: 0 28px 70px rgba(0,0,0,.22); }
+    dialog::backdrop { background: rgba(20,34,27,.35); }
+    dialog h2 { margin: 0 0 14px; font-size: 17px; }
+    dialog input { width: 100%; padding: 10px; border: 1px solid #d4d9d3; border-radius: 8px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }
+    .dialog-actions button { padding: 8px 12px; border-radius: 7px; background: #edf0eb; }
+    .dialog-actions .confirm { color: #fff; background: #285f49; }
+    .is-complete { opacity: .58; }
+    .is-complete p { text-decoration: line-through; }
+    @media (max-width: 600px) {
+      header { padding: 18px 16px 14px; }
+      .mark { width: 34px; height: 34px; border-radius: 10px; }
+      h1 { font-size: 18px; }
+      .new-task { padding: 9px 11px; }
+      main { padding: 0 16px 24px; }
+      .summary { align-items: flex-start; gap: 12px; padding: 12px; }
+      .summary > div { min-width: 0; }
+      .summary span { display: block; margin: 3px 0 0; }
+      .filter { flex: none; }
+      .board { grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
+      .column { min-height: 0; padding: 11px; }
+      .task { padding: 12px; }
+      dialog { width: calc(100% - 32px); max-width: 360px; padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="mark">T</span><div><h1>山径任务</h1><p>团队每日工作看板</p></div></div>
+    <button class="new-task" type="button" aria-label="新建任务">+ 新建任务</button>
+  </header>
+  <main>
+    <section class="summary" aria-label="任务概览">
+      <div><strong>本周任务</strong><span>5 项进行中</span></div>
+      <button class="filter" type="button" aria-label="只看已逾期任务">只看已逾期</button>
+    </section>
+    <section class="board" aria-label="任务看板" data-spec-anchor="task-board">
+      <section class="column"><div class="column-head"><h2>待办</h2><span class="count">2</span></div>
+        <article class="task overdue"><p>完成项目首页文案</p><div class="meta"><span class="tag">已逾期</span><span>林夏</span></div><button class="complete" type="button" aria-label="完成任务：项目首页文案">标记完成</button></article>
+        <article class="task"><p>整理用户反馈</p><div class="meta"><span>8 月 29 日</span><span>陈默</span></div><button class="complete" type="button" aria-label="完成任务：整理用户反馈">标记完成</button></article>
+      </section>
+      <section class="column"><div class="column-head"><h2>进行中</h2><span class="count">2</span></div>
+        <article class="task"><p>实现搜索结果排序</p><div class="meta"><span>8 月 30 日</span><span>周川</span></div><button class="complete" type="button" aria-label="完成任务：搜索结果排序">标记完成</button></article>
+      </section>
+      <section class="column"><div class="column-head"><h2>已完成</h2><span class="count">1</span></div><article class="task is-complete"><p>确认发布范围</p><div class="meta"><span>今天</span><span>唐立</span></div></article></section>
+    </section>
+  </main>
+  <dialog id="task-dialog"><h2>新建任务</h2><input aria-label="任务名称" placeholder="输入任务名称"><div class="dialog-actions"><button type="button" data-close>取消</button><button class="confirm" type="button" data-create>创建</button></div></dialog>
+  <script>
+    const dialog = document.querySelector('#task-dialog');
+    document.querySelector('.new-task').addEventListener('click', () => dialog.showModal());
+    dialog.querySelector('[data-close]').addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-create]').addEventListener('click', () => dialog.close());
+    document.querySelector('.filter').addEventListener('click', event => {
+      const active = event.currentTarget.dataset.active === 'true';
+      event.currentTarget.dataset.active = String(!active);
+      event.currentTarget.textContent = active ? '只看已逾期' : '显示全部任务';
+      document.querySelectorAll('.task:not(.overdue)').forEach(task => task.hidden = !active);
+    });
+    document.querySelectorAll('.complete').forEach(button => button.addEventListener('click', event => {
+      event.currentTarget.closest('.task').classList.add('is-complete');
+      event.currentTarget.remove();
+    }));
+  </script>
+</body>
+</html>

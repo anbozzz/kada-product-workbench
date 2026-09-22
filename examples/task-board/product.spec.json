@@ -1,0 +1,219 @@
+{
+  "schemaVersion": "0.1",
+  "product": {
+    "id": "TRAIL-TASKS",
+    "title": "山径任务看板 Product Spec",
+    "version": "0.1.0",
+    "status": "reviewing",
+    "description": "用于验证模块化 Spec 与任意 HTML 页面映射的非医疗示例。",
+    "sourceRefs": ["examples/task-board/index.html"]
+  },
+  "pages": [
+    {
+      "id": "TASK-PAGE-BOARD",
+      "title": "任务看板",
+      "responsibility": "展示任务分布并承载筛选和完成操作。",
+      "anchorHints": ["任务看板", "只看已逾期"]
+    }
+  ],
+  "modules": [
+    {
+      "id": "TASK-CAPTURE",
+      "title": "任务录入",
+      "purpose": "让团队成员把待处理工作进入看板。",
+      "scope": "新建任务及创建结果。",
+      "journeys": ["团队成员从看板首页新建任务"],
+      "nodes": [
+        {
+          "id": "TASK-ACTION-CREATE",
+          "type": "ACTION",
+          "title": "新建任务",
+          "pageId": "TASK-PAGE-BOARD",
+          "status": "confirmed",
+          "sourceKind": "product-decision",
+          "statement": "用户在看板上发起一次任务创建。",
+          "anchorHints": ["新建任务", "create task"],
+          "contentBlocks": [
+            { "id": "intent", "label": "使用意图", "content": "记录一项新的待办工作。" },
+            { "id": "before", "label": "发生之前", "content": "用户已进入任务看板。" },
+            { "id": "trigger", "label": "触发方式", "content": "点击“新建任务”。" },
+            { "id": "visible-feedback", "label": "页面反馈", "content": "打开任务录入对话框，光标进入任务名称。" },
+            { "id": "result-boundary", "label": "结果边界", "content": "提交后创建任务记录；页面示例仅作本地仿真，不证明真实接口存在。" },
+            { "id": "failure", "label": "失败处理", "content": "任务名称为空时不允许提交；服务失败时保留输入。" },
+            { "id": "observable-check", "label": "可观察检查", "content": "合法名称可创建；空值与失败结果均有明确反馈。" }
+          ],
+          "relations": [
+            { "type": "governed-by", "targetId": "TASK-RULE-NAME" },
+            { "type": "emits", "targetId": "TASK-EVENT-CREATED" },
+            { "type": "depends-on", "targetId": "TASK-EXTERNAL-TASK-SERVICE" },
+            { "type": "accepted-by", "targetId": "TASK-AC-CREATE" }
+          ]
+        },
+        {
+          "id": "TASK-RULE-NAME",
+          "type": "RULE",
+          "title": "任务名称规则",
+          "status": "draft",
+          "sourceKind": "candidate",
+          "statement": "任务名称去除首尾空格后必须非空，最长 80 个字符。",
+          "anchorHints": [],
+          "fields": { "failure": "超长或空值时返回字段级错误。" },
+          "relations": []
+        },
+        {
+          "id": "TASK-EVENT-CREATED",
+          "type": "EVENT",
+          "title": "任务已创建",
+          "status": "draft",
+          "sourceKind": "candidate",
+          "statement": "创建成功后产生任务已创建事件，供看板状态刷新。",
+          "anchorHints": [],
+          "fields": { "backendOutcome": "返回任务标识、名称与初始状态。" },
+          "relations": []
+        },
+        {
+          "id": "TASK-EXTERNAL-TASK-SERVICE",
+          "type": "EXTERNAL",
+          "title": "任务持久化服务",
+          "status": "draft",
+          "sourceKind": "candidate",
+          "statement": "正式产品需要由任务服务持久化创建结果；示例页面只有本地交互，不证明接口存在。",
+          "anchorHints": [],
+          "fields": {
+            "backendOutcome": "候选输入为任务名称，候选输出为任务标识、初始状态与创建时间；正式接口契约待研发确认。",
+            "failure": "服务不可用时不得把本地关闭对话框误判为创建成功。"
+          },
+          "relations": []
+        },
+        {
+          "id": "TASK-AC-CREATE",
+          "type": "AC",
+          "title": "新建任务验收",
+          "status": "confirmed",
+          "sourceKind": "product-decision",
+          "statement": "创建成功、空值拦截与服务失败三类路径均可验证。",
+          "anchorHints": [],
+          "fields": { "acceptance": "Given 合法任务名称，When 确认创建，Then 新任务出现在待办列。" },
+          "relations": []
+        }
+      ]
+    },
+    {
+      "id": "TASK-EXECUTION",
+      "title": "任务执行",
+      "purpose": "让团队成员聚焦到期工作并更新完成状态。",
+      "scope": "逾期筛选、任务完成与状态更新。",
+      "journeys": ["成员查看逾期任务并完成其中一项"],
+      "nodes": [
+        {
+          "id": "TASK-SURFACE-BOARD",
+          "type": "SURFACE",
+          "title": "任务看板区域",
+          "pageId": "TASK-PAGE-BOARD",
+          "status": "confirmed",
+          "sourceKind": "observed-ui",
+          "statement": "承载待办、进行中与已完成任务的主要工作区域。",
+          "anchorHints": ["任务看板", "task board", "board"],
+          "fields": {
+            "userGoal": "在一个区域内理解任务分布并进入具体操作。",
+            "frontendBehavior": "按状态分列展示任务，区域本身不承诺后台查询或权限规则。",
+            "acceptance": "区域可被唯一定位，内部操作仍分别映射到各自控件。"
+          },
+          "relations": [
+            { "type": "contains", "targetId": "TASK-ACTION-FILTER-OVERDUE" },
+            { "type": "contains", "targetId": "TASK-ACTION-COMPLETE" }
+          ]
+        },
+        {
+          "id": "TASK-ACTION-FILTER-OVERDUE",
+          "type": "ACTION",
+          "title": "只看已逾期",
+          "pageId": "TASK-PAGE-BOARD",
+          "status": "confirmed",
+          "sourceKind": "observed-ui",
+          "statement": "将看板范围切换为已逾期任务。",
+          "anchorHints": ["只看已逾期", "overdue"],
+          "fields": {
+            "userGoal": "优先处理超过截止时间的任务。",
+            "frontendBehavior": "隐藏未逾期任务，按钮文案切换为“显示全部任务”。",
+            "backendOutcome": "当前示例为本地过滤；正式产品是否使用服务端查询待确认。",
+            "acceptance": "开启后只显示逾期任务，关闭后恢复原顺序。"
+          },
+          "relations": [{ "type": "governed-by", "targetId": "TASK-RULE-OVERDUE" }]
+        },
+        {
+          "id": "TASK-RULE-OVERDUE",
+          "type": "RULE",
+          "title": "逾期判定规则",
+          "status": "draft",
+          "sourceKind": "candidate",
+          "statement": "任务未完成且截止时间早于当前时间时判定为逾期。",
+          "anchorHints": [],
+          "fields": { "backendOutcome": "以服务端标准时间计算，时区与空截止时间口径待确认。" },
+          "relations": []
+        },
+        {
+          "id": "TASK-ACTION-COMPLETE",
+          "type": "ACTION",
+          "title": "标记完成",
+          "pageId": "TASK-PAGE-BOARD",
+          "status": "confirmed",
+          "sourceKind": "product-decision",
+          "statement": "用户将指定任务从未完成转为已完成。",
+          "anchorHints": ["标记完成", "complete task"],
+          "fields": {
+            "userGoal": "记录工作已完成。",
+            "preconditions": "任务当前为未完成。",
+            "frontendBehavior": "成功后该卡片进入已完成视觉状态，防止重复提交。",
+            "backendOutcome": "持久化 completed 状态及完成时间，本地示例不证明正式接口存在。",
+            "stateChange": "OPEN → COMPLETED。",
+            "failure": "失败时恢复按钮可用状态并告知用户。",
+            "acceptance": "仅目标任务状态改变，重复操作不产生第二次完成。"
+          },
+          "relations": [
+            { "type": "transitions-to", "targetId": "TASK-STATE-COMPLETED" },
+            { "type": "permitted-by", "targetId": "TASK-PERMISSION-COMPLETE" },
+            { "type": "accepted-by", "targetId": "TASK-AC-COMPLETE" }
+          ]
+        },
+        {
+          "id": "TASK-STATE-COMPLETED",
+          "type": "STATE",
+          "title": "已完成状态",
+          "status": "confirmed",
+          "sourceKind": "product-decision",
+          "statement": "任务有明确的完成时间，且不再显示完成操作。",
+          "anchorHints": [],
+          "fields": { "stateChange": "OPEN 状态在成功处理后转为 COMPLETED。" },
+          "relations": []
+        },
+        {
+          "id": "TASK-PERMISSION-COMPLETE",
+          "type": "PERMISSION",
+          "title": "完成任务权限",
+          "status": "draft",
+          "sourceKind": "tbd",
+          "statement": "谁可以完成本人或他人的任务尚无正式来源，当前示例不得据此声明权限成立。",
+          "anchorHints": [],
+          "fields": {
+            "permissions": "待确认：任务负责人、创建人、项目管理员是否具有相同操作权限。",
+            "failure": "正式服务拒绝时，页面需保持原状态并显示可理解的权限反馈。",
+            "audit": "是否记录操作者、目标任务和完成时间待确认。"
+          },
+          "relations": []
+        },
+        {
+          "id": "TASK-AC-COMPLETE",
+          "type": "AC",
+          "title": "完成任务验收",
+          "status": "confirmed",
+          "sourceKind": "product-decision",
+          "statement": "验证成功、失败和重复请求三条路径。",
+          "anchorHints": [],
+          "fields": { "acceptance": "Given 未完成任务，When 标记完成，Then 仅该任务转为 COMPLETED 并显示完成结果。" },
+          "relations": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-product-spec.dev/schema/spec-map-0.1.json",
+  "title": "SpecMap",
+  "type": "object",
+  "required": ["@context", "id", "type", "schemaVersion", "productSpecId", "targetSource", "updatedAt", "items"],
+  "additionalProperties": true,
+  "properties": {
+    "@context": { "const": "http://www.w3.org/ns/anno.jsonld" },
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "const": "AnnotationCollection" },
+    "schemaVersion": { "const": "0.1" },
+    "productSpecId": { "type": "string", "minLength": 1 },
+    "targetSource": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "title": "SpecAnnotation",
+        "type": "object",
+        "required": ["id", "type", "motivation", "body", "target", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "const": "Annotation" },
+          "motivation": { "const": "linking" },
+          "body": {
+            "title": "SpecAnnotationBody",
+            "type": "object",
+            "required": ["id", "type"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "type": { "const": "Text" }
+            }
+          },
+          "target": {
+            "title": "SpecAnnotationTarget",
+            "type": "object",
+            "required": ["source", "selector", "fingerprint"],
+            "properties": {
+              "source": { "type": "string", "minLength": 1 },
+              "context": {
+                "title": "SpecAnnotationContext",
+                "type": "object",
+                "required": ["url"],
+                "properties": {
+                  "url": { "type": "string", "pattern": "^/target(?:-dev)?/" }
+                }
+              },
+              "selector": {
+                "title": "SpecCssSelector",
+                "type": "object",
+                "required": ["type", "value"],
+                "properties": {
+                  "type": { "const": "CssSelector" },
+                  "value": { "type": "string", "minLength": 1 }
+                }
+              },
+              "fingerprint": {
+                "title": "ElementFingerprint",
+                "type": "object",
+                "required": ["tag", "text"],
+                "additionalProperties": true,
+                "properties": {
+                  "tag": { "type": "string" },
+                  "role": { "type": "string" },
+                  "text": { "type": "string" },
+                  "ariaLabel": { "type": "string" }
+                }
+              }
+            }
+          },
+          "status": { "enum": ["confirmed", "invalid", "ambiguous", "drifted", "out-of-context"] },
+          "confirmedAt": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "source": "维护者显式提供的共享 Skill；相对路径从 skills 根开始，内容由 SHA-256 固定。",
+  "files": {
+    "product-documentation/SKILL.md": "3b3ed02cd79e4e510f2f7c93058a409bdb296b69669b7ef048e556fcbf439a0b",
+    "product-documentation/agents/openai.yaml": "1c6a197a3d344507002bb4f59c3aafba7b79300761bde6c77ae711bf69f9f4c8",
+    "product-documentation/agents/prd-reviewer.md": "7b69f45fb2556e4c2878a5fe8867b9445f3bde778382ecab28a5387e76d42a38",
+    "product-documentation/agents/spec-reviewer.md": "e2c3368a62315b7e5e7e6b1e60386155e47267630e3194ec749fab07789dc2ad",
+    "product-documentation/references/mapping-workflow.md": "6aa67955916c159b0d8ffe01dfea4919835a0cd9b4b315d291ac4a6f20e35326",
+    "product-documentation/references/product-spec.md": "adc508255935e1cdf675977ec87574ccfc7a1ccac379234743d30dd4d3b8bb81",
+    "product-documentation/references/projection.md": "18a0bc1931c8c90160566a6d5caddc26aa886729b756c6a67f3ac7f7e44a25ce",
+    "product-documentation/references/spec-derivation.md": "d876b08e864a5ec2b2067f5d7d256ddb7efbf7a9ce5808f7d07943edce5d3d42",
+    "product-documentation/references/standard-product-document.md": "31ef4cacb3cfc398afdc0b649d7860d87c77ca9a6a89845047eaf180b69faa1a",
+    "software-architecture-design/SKILL.md": "293453cce798e6ed3254b8be1cdfeb5bb40b09c1df95fc1b49c3e8177d84c7e9",
+    "software-architecture-design/assets/adr-template.md": "d90d2f99b615858517b5e2532ce5fdaaabd25439fee33a7e4253ee29763311b2",
+    "software-architecture-design/assets/architecture-design-template.md": "78185bc76d5c6850c07283cc325b79e6413cfbc45846792c1f40dd7cd1e4820a",
+    "software-architecture-design/assets/rfc-template.md": "437dc048519c0699a382dba92a6b2ef98ea0e5fd42c4e00288c3546a84ccb8ee",
+    "software-architecture-design/references/architecture-design-standard.md": "81459cec373a620ef434d0032911bff6dfce637cf1f29fbee3cd4199097c014e",
+    "software-architecture-design/references/artifact-lifecycle.md": "5144e5abfc5e89264962acbd191c23e216531e75368a8a6e1b0893af4e8005d2",
+    "software-architecture-design/references/example-cross-module-architecture-design.md": "8413f84dc0fc5b21a60ba13f18ce82b510b6629488798f50ae1b84d0cbd51f8b",
+    "software-architecture-design/references/source-basis.md": "4c0624a02efa25c44fb2f5d4ed5d2533de94b29ad6e6bb5e0880d1319d68bff4",
+    "software-architecture-design/scripts/test_validate_architecture_artifact.py": "824eea03006f33319b1d6fed16c4e23014894705a14fc2586cee4abbfaee7fc4",
+    "software-architecture-design/scripts/validate_architecture_artifact.py": "e78de49ba0e772cb379ba394fa0e0cef9ff0215970000e0277223392cd1b9a33",
+    "prd-concise-cn/SKILL.md": "7e09f6b0dcbb748b2ce863e6ee8d60e56a132cd078683c8ee51a345727dd059a",
+    "prd-concise-cn/agents/openai.yaml": "3857d0d3aae1aa0ba85390c743f0af091bc4e542dd8b7bfdefb911ee38c0571c"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "id": "urn:interactive-product-spec:map:TRAIL-TASKS",
+  "type": "AnnotationCollection",
+  "schemaVersion": "0.1",
+  "productSpecId": "TRAIL-TASKS",
+  "targetSource": "examples/task-board/index.html",
+  "updatedAt": "2026-08-28T00:32:06.162Z",
+  "items": []
+}

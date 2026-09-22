@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
+  <title>咔哒积木图标</title>
+  <rect x="1" y="1" width="126" height="126" rx="28" fill="#0b0e12" stroke="#293138" stroke-width="2"/>
+  <defs>
+    <g id="brick">
+      <path d="M0 10 34 22V39L0 27Z" fill="#56be92"/>
+      <path d="M34 22 54 10V27L34 39Z" fill="#2d8268"/>
+      <path d="M0 10 20 0 54 10 34 22Z" fill="#76ddaa"/>
+      <path d="M10 5V10C10 14 22 14 22 10V5Z" fill="#389e7a"/>
+      <ellipse cx="16" cy="5" rx="6" ry="3.3" fill="#8cebb9"/>
+      <path d="M28 10V15C28 19 40 19 40 15V10Z" fill="#389e7a"/>
+      <ellipse cx="34" cy="10" rx="6" ry="3.3" fill="#8cebb9"/>
+    </g>
+  </defs>
+  <use href="#brick" x="12" y="74"/>
+  <use href="#brick" x="35" y="47"/>
+  <use href="#brick" x="58" y="20"/>
+</svg>

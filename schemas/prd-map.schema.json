@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-product-spec.dev/schema/prd-map-0.1.json",
+  "title": "PrdMap",
+  "type": "object",
+  "required": ["schemaVersion", "productId", "prd", "targetSource", "updatedAt", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "productId": { "type": "string", "minLength": 1 },
+    "prd": {
+      "title": "PrdMapDocument",
+      "type": "object",
+      "required": ["path", "revision", "profileVersion"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "minLength": 1 },
+        "profileVersion": { "const": "可映射PRD-v1" }
+      }
+    },
+    "targetSource": { "type": "string", "minLength": 1 },
+    "updatedAt": { "type": "string", "minLength": 1 },
+    "items": {
+      "type": "array",
+      "items": {
+        "title": "PrdPageAnnotation",
+        "type": "object",
+        "required": ["id", "page", "sectionIds", "confirmedAt", "updatedAt"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "page": {
+            "title": "PrdPageTarget",
+            "type": "object",
+            "required": ["title", "context"],
+            "additionalProperties": false,
+            "properties": {
+              "pageId": { "type": ["string", "null"] },
+              "title": { "type": "string", "minLength": 1 },
+              "context": {
+                "type": "object",
+                "required": ["url"],
+                "additionalProperties": false,
+                "properties": {
+                  "url": { "type": "string", "pattern": "^/target(?:-dev)?/" }
+                }
+              }
+            }
+          },
+          "sectionIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^(需求|规则)-[^\\s]+(?:-[^\\s]+)*$"
+            }
+          },
+          "confirmedAt": { "type": "string", "minLength": 1 },
+          "updatedAt": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

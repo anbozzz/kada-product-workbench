@@ -1,0 +1,95 @@
+{
+  "source": "workplace-ai shared Skill source; not an installed plugin cache",
+  "files": [
+    {
+      "path": "skills/_index.md",
+      "before": "3619c78ee561ea084aa89f5731e592d2c285f35d0da46be4e8dc4cb0e3b5a75a",
+      "after": "263fa518f1e21f0d32fa3a38ffe3f37b706647f05d2caf20c0d714b13c951d80"
+    },
+    {
+      "path": "skills/interactive-product-spec/SKILL.md",
+      "before": "d21ae04fdd1dc97c1659e300b4ca9b5f8fd54d1545ba73f237ed033424e4d78e",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/agents/openai.yaml",
+      "before": "f626f2ec728500de263a76e35c697f24585a269422521d72a7a515275be27cbe",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/agents/spec-reviewer.md",
+      "before": "772349c147d2601aff4781d00245d63cf374262c30cfbb48a7812311925d8b0c",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/references/mapping-workflow.md",
+      "before": "0cfef936828df172989a42fa6bc80d41f2645dcd563e2cd181297cecbd83f116",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/references/projection.md",
+      "before": "a7acf24901ccccc50a9e2da41599a8421ba4c71a9239b703eabb2599be1391cd",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/references/spec-standard.md",
+      "before": "d66e7e6ac2715beff7f6246c96defdd75f0bd6dbc394ef9c7de226e5ef219917",
+      "after": null
+    },
+    {
+      "path": "skills/interactive-product-spec/references/workbench-reference.md",
+      "before": "0d373bae60c4af7254d285e5b5fe6db8b0447622389d28f244b343e13d2a212d",
+      "after": null
+    },
+    {
+      "path": "skills/product-documentation/SKILL.md",
+      "before": "e1de6aa289033ac2e1b9a0fc113b35950b83a3420e3562272e06788efc617e32",
+      "after": "36bdb2bcc69169ba646db5f76f242e15979bb3807b71b0ab4a7e7f39fe6a5517"
+    },
+    {
+      "path": "skills/product-documentation/agents/openai.yaml",
+      "before": "6b28c28a538c5c0f355ebf31dd8e913e806718ecad433802553290921ab6ec36",
+      "after": "827a9729f6278fb5b663ae3cb12705aed85d8d00fb35a7d5be99255bb6671abb"
+    },
+    {
+      "path": "skills/product-documentation/agents/spec-reviewer.md",
+      "before": null,
+      "after": "6632c5c01c8141c496296096b0a3767396d8ba2b44f76a613197aeea041af4b3"
+    },
+    {
+      "path": "skills/product-documentation/references/html-document-sync.md",
+      "before": "3c6c9244424570a7f2aa65fee9b10fd2b4aa56fd6ece5147953e8b159d17e00c",
+      "after": "8e7a2ea0bf330726ff31b62f414c5942cc691d4a5acd5bd63a246ffb0b5920af"
+    },
+    {
+      "path": "skills/product-documentation/references/mapping-workflow.md",
+      "before": null,
+      "after": "0285743a40467758e90089ad69a52df7ea79e44d2cbb3ccfc4fe0c7be1b53fbe"
+    },
+    {
+      "path": "skills/product-documentation/references/product-spec.md",
+      "before": "af27377330b61a6efc6d9170bd9399f4d7223aad385d18f6c4bf12988b7112a6",
+      "after": "b88112caae644d0ec6bb645adcadd72770fa0670ad8a9e3859c0f2624a57d8bb"
+    },
+    {
+      "path": "skills/product-documentation/references/projection.md",
+      "before": null,
+      "after": "18a0bc1931c8c90160566a6d5caddc26aa886729b756c6a67f3ac7f7e44a25ce"
+    },
+    {
+      "path": "skills/product-documentation/references/workbench-reference.md",
+      "before": null,
+      "after": "0d373bae60c4af7254d285e5b5fe6db8b0447622389d28f244b343e13d2a212d"
+    },
+    {
+      "path": "system-architecture/model/relationships.json",
+      "before": "ff5402700f733d0a67c8c8dc968715cddf328e62ac3fd9e2e612ef422245b4df",
+      "after": "5487bab0bd7d24d2eb83dcf13338a2275da3d9e0c57c270b3fff7b5a709cd0a4"
+    },
+    {
+      "path": "system-architecture/scripts/test_update_architecture.py",
+      "before": "9c826d5c5dddc0197e7b6fed7aae003471f1e3c5326dad473c0c75696c34f6c1",
+      "after": "4d7d057ec9fc630ff4e4e54ea8ed895dc2b1cba7bed4bb9d8025d5216e6cb302"
+    }
+  ]
+}

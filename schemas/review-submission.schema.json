@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-product-spec.dev/schema/review-submission-0.1.json",
+  "title": "Interactive Product Spec 审阅回传 v0.1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "type",
+    "decision",
+    "sessionId",
+    "sourceSpec",
+    "viewSpec",
+    "specMap",
+    "changes",
+    "submittedAt",
+    "applyTarget"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "type": { "const": "interactive-product-spec-review" },
+    "decision": { "const": "submit" },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "projectPath": { "type": "string" },
+    "productSpecId": { "type": "string", "minLength": 1 },
+    "sourceSpec": {
+      "type": "object",
+      "required": ["path", "revision"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "revision": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "viewSpec": {
+      "type": "object",
+      "required": ["path", "baseRevision", "draftRevision"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string" },
+        "baseRevision": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "draftRevision": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "specMap": {
+      "type": "object",
+      "required": ["path", "updatedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["nodeId", "moduleId", "operation", "before", "after"],
+        "additionalProperties": true,
+        "properties": {
+          "nodeId": { "type": "string", "minLength": 1 },
+          "moduleId": { "type": "string" },
+          "moduleTitle": { "type": "string" },
+          "operation": { "enum": ["add", "update", "remove"] },
+          "before": { "type": ["object", "null"] },
+          "after": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "submittedAt": { "type": "string" },
+    "applyTarget": { "const": "source-spec-markdown-only" }
+  }
+}

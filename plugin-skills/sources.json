@@ -1,0 +1,19 @@
+{
+  "capturedOn": "2026-09-05",
+  "sources": [
+    {
+      "skill": "diagram-design",
+      "source": "Workspace 已有 diagram-design，MIT，Cathryn Lavery",
+      "entrypoint": "中文适配，原说明保留在 UPSTREAM-SKILL.md",
+      "upstreamEntrySha256": "26d70e99ad8bf72be45952a1ba5c44f849b35da36124bcd9953694eefb5b615b"
+    },
+    {
+      "skill": "ui-ux-pro-max",
+      "source": "本机已有 ui-ux-pro-max 0.1.0；上游 nextlevelbuilder/ui-ux-pro-max-skill，MIT",
+      "entrypoint": "中文适配，原说明保留在 UPSTREAM-SKILL.md",
+      "upstreamEntrySha256": "e3048deafc62fb65192f99e51a48094571de059634b8bb27f50f37af0c43ba59"
+    }
+  ],
+  "grilling": "基于本机已有审问方法作中文表达，保留逐项追问、推荐答案、用户决定与确认边界。",
+  "ant-design-html": "本项目原创；固定依赖版本见生成脚本，Ant Design 和 Ant Design Mobile 由目标项目安装。"
+}

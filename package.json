@@ -1,0 +1,51 @@
+{
+  "name": "interactive-product-spec",
+  "version": "0.12.6",
+  "type": "module",
+  "description": "模块化 Product Spec 的可视化页面关联、浏览与修订工作台",
+  "bin": {
+    "interactive-product-spec": "./cli.mjs"
+  },
+  "files": [
+    "cli.mjs",
+    "src/",
+    "web/",
+    "runtime/",
+    "schemas/",
+    "plugin-skills/",
+    "scripts/build-plugin-bundle.mjs",
+    "scripts/plugin-readiness.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build:ui": "npm --prefix ui run build",
+    "build:windows-viewer": "./scripts/build-windows-review-launcher.sh",
+    "generate:contracts": "node scripts/generate-contract-types.mjs",
+    "check:contracts": "node scripts/generate-contract-types.mjs --check",
+    "check:architecture": "node scripts/check-architecture.mjs",
+    "check:diff": "git diff --check",
+    "package:plugin": "node scripts/build-plugin-bundle.mjs",
+    "package:release": "node scripts/build-plugin-release.mjs",
+    "check:ui": "npm run check:contracts && npm --prefix ui run build",
+    "start": "node cli.mjs start --port 4317",
+    "example": "node cli.mjs map --html examples/task-board/index.html --spec examples/task-board/product.spec.json --map examples/task-board/spec-map.json --port 4317",
+    "validate:example": "node cli.mjs validate --spec examples/task-board/product.spec.json --map examples/task-board/spec-map.json",
+    "test": "npm run check:architecture && npm run check:ui && node --test tests/*.test.mjs",
+    "verify": "node scripts/verify.mjs",
+    "prepack": "npm run build:ui",
+    "sync:skills": "node scripts/sync-plugin-skills.mjs"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "mdast-util-from-markdown": "^2.0.3"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^16.0.0",
+    "playwright-core": "^1.62.1"
+  }
+}

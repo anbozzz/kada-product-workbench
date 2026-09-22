@@ -1,0 +1,1118 @@
+--- a/skills/software-architecture-design/SKILL.md
++++ b/skills/software-architecture-design/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: software-architecture-design
+-description: 在 PRD 讨论、Spec 编写和实现中，按模块、路由、状态数据、接口、权限或部署等实际影响完成必要架构设计。适用于持续 HTML 产品和前后端开发；默认将工程决定写入 Spec。普通样式、文案及不涉及这些边界的局部修复不使用。
++description: 在 PRD 已明确主要目标与约束后、Spec 派生和实现前，设计或复用系统、模块、数据和协作机制；实现变化时维护相关决定。适用于持续 HTML 产品和前后端开发；技术设计独立维护，供 Spec 按明确引用派生。普通样式、文案及不涉及这些边界的局部修复不使用。
+ ---
+
+ # 软件架构设计
+@@ -20,16 +20,16 @@
+
+ ## 输入、设计与写入
+
+-读取本批产品要求、Project 正式约束及相关源码、接口、数据和运行环境。没有源码时据已知要求设计并标明候选。参与 PRD 或 Spec 时按 [Spec 工程约束](references/product-engineering.md) 选择适用维度并设计机制，再按 [方法选择](references/method-selection.md) 选择表达；独立架构任务按下表进入对应路径。
++读取本批 PRD、正式工程入口、源码、接口和运行环境。PRD 足以支撑系统划分时即开始，不必等待所有细节定稿；本批需要的架构决定明确后才派生供实施的 Spec。已有架构足够时复用，不为每次功能修订重做。
+
+-| 当前阶段 | 结果写入 |
+-|---|---|
+-| PRD 讨论 | 核对产品行为能否兑现；技术选择影响用户可见结果时，按工程约束的反馈方式修订 PRD。讨论中的技术候选留在当前任务，不提前生成整份 Spec |
+-| Spec 首次设计、全量重生成，或修订与实现中涉及上述影响 | 依据本批 PRD 适用内容设计必要机制；在功能对应标准标题下写明实际执行步骤及分支，不能只挂架构链接。共享技术定义与取舍写入同一 Spec 工程章节，产品语义变化先回 PRD |
+-| 用户明确要求独立架构产物，或 Project 已采用该生命周期 | 读取 [独立产物路径](references/artifact-lifecycle.md)，沿其入口维护，不另在 Spec 保存一套决定 |
+-| 独立架构任务没有产品 Spec | 同上；新产品尚未创建 Spec 本身不构成独立任务 |
++按 [架构设计方法](references/product-engineering.md) 作出系统、模块、状态数据、关键协作及适用质量决定，再按 [方法选择](references/method-selection.md) 表达。技术内容只在 Project 的一份当前架构设计或已有明确分工的入口维护，默认无入口时使用 `architecture/designs/product.md`；引用来源需求 ID，章节使用稳定 architecture-id。不按页面操作节点组织设计，不在 Spec 另存一套技术决定。
+
+-独立设计、长期决定或多方征求意见，再按独立产物路径选择模板。仅查看、映射、转换既有正文不触发新设计。方法包维护才读取 [来源依据](references/source-basis.md)；边界难判断时读取 [示例](references/examples.md)。
++- PRD 负责产品行为；技术方案改变可用动作、保存结果、权限或其他产品结果时，先反馈并修订 PRD，保留实际确认状态。
++- 架构负责共同技术方案及必要实施机制。不能把尚未设计的技术细节交给派生器临时推理。
++- Spec 通过产品文档 Skill 的 [派生合同](../product-documentation/references/spec-derivation.md) 引用技术来源；修改 Spec 的技术意见回到相应架构章节处理，检查相关功能影响后重新派生。
++- 已有 Spec 中的有效技术设计只有在明确迁移范围内才迁出，保留稳定决定 ID、状态及引用；历史和人工 Map 不自动迁移。
++
++通常使用 [架构设计标准](references/architecture-design-standard.md)；独立 ADR、RFC 或已有多文档生命周期才加载 [产物路径](references/artifact-lifecycle.md)，不默认创建成套文件。仅查看、映射或程序转换不触发新设计。
+
+ ## 完成
+
+--- a/skills/software-architecture-design/references/examples.md
++++ b/skills/software-architecture-design/references/examples.md
+@@ -2,7 +2,7 @@
+
+ 这些示例只说明如何使用同一规格，不提供任何真实 Project 的业务事实。
+
+-以下独立文件成品只供已经选择独立生命周期的任务对照；默认产品任务将相同必要语义写入 Spec 工程章节：
++以下成品展示较完整的独立架构设计；普通任务按实际影响选择内容，不强制套用八章：
+
+ - [`example-cross-module-architecture-design.md`](example-cross-module-architecture-design.md)：按固定八章规格填写的 Architecture Design。
+ - [`example-state-ownership-adr.md`](example-state-ownership-adr.md)：与上例关联的长期状态所有权决定。
+@@ -21,7 +21,7 @@
+
+ 判断：适用。至少命中跨模块职责、状态所有权、接口合同、运行失败和可能的数据一致性约束。
+
+-在同一 Spec 的工程章节按实际影响展开：
++在独立架构文档按实际影响展开：
+
+ - 领域与所有权：明确申请对象、状态所有者和各模块责任；必要时形成 Context Map。
+ - 静态结构：C4 Context/Container 说明系统和模块边界；只有容器内部责任仍不清时才增加 Component。
+@@ -37,7 +37,7 @@
+
+ 任务原本是修复保存失败，调查后发现两个模块都能修改同一状态，且没有唯一事实源。
+
+-判断：任务从局部修复升级为架构设计。先在当前 Spec 工程章节或该 Project 已采用的架构入口明确状态所有权、写入边界、兼容迁移和回归验证。
++判断：任务从局部修复升级为架构设计。先在当前 独立架构文档或该 Project 已采用的架构入口明确状态所有权、写入边界、兼容迁移和回归验证。
+
+ 原始修复目标仍决定范围；不得借机重构所有模块。采用的状态所有权决定与实现状态在同一正式入口维护，已有 `ARCHITECTURE.md` 时同步其已验证事实。
+
+@@ -47,4 +47,4 @@
+
+ 判断：适用。页面唯一性、路由、多入口共享页面、业务状态、复用组件、模拟数据初始化与源码构建方式都将持续约束实现；没有后端不等于没有工程边界。
+
+-结果：同一 Spec 先固定页面职责、入口与返回、共享布局和组件边界、数据所有者与重置方式、唯一源码目录、构建及交付目录、运行和浏览器验收。只有来源确定的实际页面进入工作台证据；不用静态演示证明真实保存或权限。不要求增加 API、数据库、部署集群或独立架构文件。
++结果：独立架构先固定页面职责、入口与返回、共享布局和组件边界、数据所有者与重置方式、唯一源码目录、构建及交付目录、运行和浏览器验收。只有来源确定的实际页面进入工作台证据；不用静态演示证明真实保存或权限。不要求增加 API、数据库、部署集群等无关设计。
+--- a/skills/software-architecture-design/references/product-engineering.md
++++ b/skills/software-architecture-design/references/product-engineering.md
+@@ -1,17 +1,17 @@
+-# Spec 工程约束
++# 架构设计方法
+
+-在 PRD 可行性讨论、Spec 融合设计或既有机制调整时读取。当前 Codex 任务结合本批 PRD、Spec、Project 约束及源码完成适用设计；产品标题与适用性定义由 [PRD 标准](../../product-documentation/references/standard-product-document.md) 维护，本文件只定义兑现产品要求的工程维度。
++在 PRD 之后的架构设计、可行性反馈或既有机制调整时读取。当前 Codex 任务结合本批 PRD、Spec、Project 约束及源码完成适用设计；产品标题与适用性定义由 [PRD 标准](../../product-documentation/references/standard-product-document.md) 维护，本文件只定义兑现产品要求的工程维度。
+
+ ## 先从产品行为选择工程设计
+
+ 1. 读取完整功能及适用公共规则，辨认哪些产品行为需要工程保证：读写与状态归属、执行顺序、生效依据、重复与冲突、失败与恢复、质量和安全边界。按下表逐项判断适用性，再选择已有约束或设计具体方案；未知不能当成不适用。
+ 2. 用实际对象、操作和依赖确定机制，随后按 [方法选择](method-selection.md) 选择必要的图或表。不能只写“保证一致性、支持重试”，也不为不存在的远程调用或部署环境添加设计。
+ 3. 缺少产品决定时反馈产品文档流程；缺少工程机制由当前任务设计；缺少接口、设备或运行事实时，标明候选合同、仿真或待接入边界，不能声称已具备真实接入能力。普通工程取舍无需产品用户选择算法。
+-4. 将机制落实到 Spec 对应功能的标准标题下，写清执行时的输入身份、责任方、先后关系、成功依据和恢复动作；共享技术定义与取舍集中在工程章节。设计与功能成文同步进行，不等摘要生成后再补通用原则。
++4. 按系统、模块、核心对象与共同机制组织设计，引用其支撑的需求 ID；写清责任、输入输出、执行顺序、成功依据和恢复机制。技术定义维护在独立架构中，Spec 只按明确关联派生，不由每个操作重新设计。
+
+ ## 工程设计维度
+
+-下表名称用于同一 Spec 工程章节的标准小节标题；只展示本批适用项。条目尚未决定时在其原位置说明缺口、影响和所需依据，不输出空模板。每项决定关联适用 PRD 或 Spec 功能 ID，交代它兑现的产品要求。
++下表用于选择本批适用设计，不是必须逐项填写的标题模板。条目尚未决定时在其原位置说明缺口、影响和所需依据，不输出空模板。每项决定关联适用 PRD 或 Spec 功能 ID，交代它兑现的产品要求。
+
+ | 标准标题 | 何时适用 | 必须回答什么、如何落实到功能 |
+ |---|---|---|
+@@ -20,7 +20,7 @@
+ | 页面、路由与组件 | 建设可持续修改的用户界面 | 页面 ID 到路由及实现入口怎样对应，多入口是否复用，参数、直接打开、返回和上下文恢复怎样实现？公共组件的输入输出与差异是什么？功能正文保留具体导航与交互。 |
+ | 数据模型与持久化 | 读取、修改、关联或保存业务数据 | 稳定身份、逻辑模型、关系、约束、权威读写入口、保存介质及提交点是什么，历史、删除、缓存失效如何处理？功能写明读写对象与真正生效依据；有持久化变更时定义迁移。 |
+ | 状态与事件 | 存在业务生命周期、共享状态或异步事件 | 业务状态、跨页面状态、临时编辑状态分别归谁，合法迁移和事件顺序如何保证，怎样避免陈旧状态覆盖？功能列实际状态迁移、中间态及联动。 |
+-| 接口与外部依赖 | 调用服务、设备、外部系统或异步任务 | 请求、响应、身份与关联键、错误分类、时限、取消语义、版本兼容与责任边界是什么？已有合同引用固定版本，待建合同在本 Spec 定义到可实施程度；功能明确何时调用、如何判定及处理结果。 |
++| 接口与外部依赖 | 调用服务、设备、外部系统或异步任务 | 请求、响应、身份与关联键、错误分类、时限、取消语义、版本兼容与责任边界是什么？已有合同引用固定版本，待建合同在架构文档定义到可实施程度；功能明确何时调用、如何判定及处理结果。 |
+ | 事务、并发与幂等 | 存在多步写入、重复触发或竞争修改 | 原子范围、冲突检测及裁决、同一次操作的识别与去重期限是什么，是否需版本检查或锁，乱序结果如何处理？功能说明重复、冲突时具体动作和返回结果，不能只引用“幂等”。 |
+ | 失败、核实与恢复 | 存在依赖失败、部分完成、结果未知或中断 | 怎样区分未执行、失败、已成功与待核实，如何关联并查询原操作；重试范围、次数或截止条件、补偿、断点恢复及人工接续如何实现？功能逐分支交代可执行顺序，先核实未知结果，避免重复产生事实。 |
+ | 权限、安全与审计 | 存在鉴权、敏感数据、审计或不可逆写入 | 校验在哪些可信边界执行，访问与数据范围如何约束，会话失效、脱敏、密钥、留痕与更正怎样落实？功能写拒绝与恢复行为；演示开关不能证明真实权限。 |
+@@ -32,18 +32,18 @@
+
+ 这些维度按实际依赖选择，不以 HTML 或完整开发标签决定是否需要并发、恢复等设计。HTML 仿真只兑现其声明的范围；真实服务端、持久化、鉴权和部署要求在完整开发涉及的范围内落实。具体实现代码、迁移脚本与测试归源码；正式合同已在源码维护时精确引用，功能正文仍保留理解与执行所需细节。
+
+-## 产品反馈与 Spec 融合
++## 产品反馈与 Spec 派生
+
+ 架构可以选择不改变产品行为的内部机制，不能另定用户可见的规则。若方案改变可用动作、保存时机、可见范围、冲突裁决、允许丢失的数据、失败后的继续方式或其他产品结果：
+
+ - 先说明受影响的 PRD 功能与标准标题、原行为、技术约束、建议行为及取舍，交由当前任务按产品文档流程修订 PRD；需要用户裁决时只保留具体待决问题。
+-- 将本次产品决定写回 PRD 并保留实际确认状态，再同步 Spec 的对应功能与工程决定。PRD 讨论阶段尚未授权 Spec 时，不为保存技术候选提前生成整份 Spec。
+-- 若仍未决定，在受影响的 PRD 和 Spec 原位置保留一致的未知与临时边界，不让工程候选成为默认产品规则，也不阻断无关功能。
++- 将本次产品决定写回 PRD 并保留实际确认状态，再更新架构并重新派生受影响 Spec。PRD 讨论阶段尚未授权 Spec 时，不为保存技术候选提前生成整份 Spec。
++- 若仍未决定，在受影响的 PRD 和 架构原位置保留一致的未知与临时边界，不让工程候选成为默认产品规则，也不阻断无关功能。
+
+-Spec 功能正文直接说明采用机制在本操作中的用法；工程章节集中解释接口合同、复用定义及技术理由。共享机制只完整定义一次，但引用不能取代功能具体步骤、分支和恢复动作。不得只在对话、架构图或公共规则链接中保留必要设计。
++独立架构维护接口合同、共同机制及必要的适用条件与执行顺序，并通过需求 ID 说明适用范围。Spec 原样引用这些来源，不能在派生中补机制；需要进一步详细设计时回到相应技术模块补齐。
+
+ ## 决定与实现状态
+
+ 必要技术决定记录稳定 ID、原因、范围、明确不改、采用方案、否决方案及理由、影响和回归检查；被替代时保留关联。状态为 `proposed → adopted → implemented → superseded`，与产品确认分开；只有源码及验证支持时才记为已实现。
+
+-完成时按本批适用维度检查能否继续实现，保留未决项和证据限制。没有采用独立架构生命周期时，不另建 Architecture Design、ADR 或实现合同。实际制品验证沿 [统一 Spec 标准](../../product-documentation/references/product-spec.md#36-验收与变更影响) 执行；文档修改只检查语义、格式与引用。
++完成时按本批适用维度检查能否继续实现，保留未决项和证据限制。默认维护一份当前架构设计，只有实际协作或 Project 已有生命周期需要时再使用 ADR/RFC，不另建重复实施合同。实际制品验证沿 [统一 Spec 标准](../../product-documentation/references/product-spec.md#36-验收与变更影响) 执行；文档修改只检查语义、格式与引用。
+--- a/skills/software-architecture-design/references/method-selection.md
++++ b/skills/software-architecture-design/references/method-selection.md
+@@ -8,7 +8,7 @@
+
+ | 检查面 | 要回答的问题 | 可用表达 |
+ |---|---|---|
+-| 目标与范围 | 必须实现什么，明确不改什么，哪些事实未知？ | Spec 工程章节或已采用的独立设计 |
++| 目标与范围 | 必须实现什么，明确不改什么，哪些事实未知？ | 独立架构文档或已采用的独立设计 |
+ | 质量 | 在什么环境、什么触发下应有怎样的响应，怎样判断达标？ | 质量场景 |
+ | 领域与所有权 | 核心对象、不变量、状态数据和业务决定归谁？ | 领域边界、聚合、上下文关系 |
+ | 静态结构 | 系统、模块、服务、存储及外部系统怎样依赖？ | 必要层级的 C4 图 |
+--- a/skills/software-architecture-design/references/decision-record-standard.md
++++ b/skills/software-architecture-design/references/decision-record-standard.md
+@@ -21,11 +21,11 @@
+
+ ## RFC：决定前征求多方意见
+
+-使用 [`../assets/rfc-template.md`](../assets/rfc-template.md)。只有多个独立责任方必须异步提出意见、承诺接口或承担运行责任时才使用。根 Agent 可以自己完成的技术取舍直接写当前 Spec 工程章节或已采用的 Architecture Design/ADR，不创建虚假的协商流程。
++使用 [`../assets/rfc-template.md`](../assets/rfc-template.md)。只有多个独立责任方必须异步提出意见、承诺接口或承担运行责任时才使用。根 Agent 可以自己完成的技术取舍直接写当前 独立架构文档或已采用的 Architecture Design/ADR，不创建虚假的协商流程。
+
+ RFC 固定包含：状态和期限、问题与范围、约束、提案、接口和责任变化、候选取舍、迁移回滚、验证、明确问题、意见记录和关闭结果。
+
+-RFC 状态只使用：`draft、open、closed`。关闭结果只使用：`adopted、rejected、withdrawn、replaced`。`adopted` 只说明提案被采用；长期决定的原因和验证方式回到 Spec 工程章节或该 Project 已采用的 ADR，不能产生第二个决定源。
++RFC 状态只使用：`draft、open、closed`。关闭结果只使用：`adopted、rejected、withdrawn、replaced`。`adopted` 只说明提案被采用；长期决定的原因和验证方式回到 独立架构文档或该 Project 已采用的 ADR，不能产生第二个决定源。
+
+ ## 决策责任
+
+--- a/skills/software-architecture-design/references/source-basis.md
++++ b/skills/software-architecture-design/references/source-basis.md
+@@ -18,7 +18,7 @@
+ - arc42 提供覆盖面，避免遗漏质量、部署、风险等技术架构内容。
+ - C4、时序图、状态图和 ERD 只负责表达已经完成的判断，不各自形成独立流程。
+ - DDD 帮助确定业务模型和责任边界，但模块化单体、微服务或事件驱动仍需结合质量与运行约束取舍。
+-- MADR 提供长期决定需要保留的语义；默认产品任务把决定记入同一 Spec，明确使用独立文件时才套用 ADR 模板。RFC 只解决决定前的多方征求意见，不能替代正式决定。
++- MADR 提供长期决定需要保留的语义；默认把决定记入当前独立架构，实际需要长期单独追踪时才使用 ADR 模板。RFC 只解决决定前的多方征求意见，不能替代正式决定。
+ - Spec Kit 只证明模板化和项目覆盖机制可行，不证明每个 Project 都必须拥有 Plan、Change 或 Progress。
+
+ ## 维护规则
+--- a/skills/software-architecture-design/references/artifact-lifecycle.md
++++ b/skills/software-architecture-design/references/artifact-lifecycle.md
+@@ -1,6 +1,6 @@
+ # 独立架构文件的生命周期与路径
+
+-仅在 Skill 主文件确定使用独立架构产物时读取。默认产品工程设计已由 Spec 承接，不因新产品尚未创建 Spec 就进入本路径。
++仅在需要选择既有多文档入口、ADR 或 RFC 时读取。普通产品任务在一份独立架构设计维护技术决定，Spec 为其派生视图。
+
+ ## 按信息选择产物
+
+@@ -13,7 +13,7 @@
+ | 已实现并验证的当前架构事实 | Project 已采用的 `ARCHITECTURE.md` 或等价入口，依据源码和测试维护 |
+ | 当前进度和阻塞 | Project 已有 Progress 机制，只链接正式产物，不保存另一份设计 |
+
+-完整读取所选标准和模板。独立 Architecture Design、ADR、RFC 从本 Skill 目录运行 `python3 scripts/validate_architecture_artifact.py <文件路径>` 检查；整份 Spec 不送入该验证器。
++读取实际所选标准；只有采用模板时读取模板。沿用八章 Architecture Design 或独立 ADR、RFC 时，从本 Skill 目录运行 `python3 scripts/validate_architecture_artifact.py <文件路径>` 检查；整份 Spec 不送入该验证器。
+
+ ## 路径
+
+--- a/skills/software-architecture-design/references/architecture-design-standard.md
++++ b/skills/software-architecture-design/references/architecture-design-standard.md
+@@ -1,10 +1,10 @@
+-# Architecture Design 固定规格
++# 架构设计内容与验证
+
+ ## 适用范围
+
+-只有 Skill 主文件判断需要设计，且 `artifact-lifecycle.md` 已选择独立架构文件路径时，才生成 Architecture Design。默认产品任务使用同一 Spec 的工程章节，不套用本独立八章模板。独立文件描述本次范围的技术架构候选、决定与实施验证边界，不代替产品文档、任务拆分、测试用例或当前系统架构总览。
++Skill 判断需要新设计时，在当前独立架构入口维护。普通任务按实际需要使用下述设计内容，不强制八章模板、空栏或独立 ADR。只有沿用既有八章格式时才用模板和其校验器。独立文件描述本次范围的技术架构候选、决定与实施验证边界，不代替产品文档、任务拆分、测试用例或当前系统架构总览。
+
+-使用 [`../assets/architecture-design-template.md`](../assets/architecture-design-template.md)。顶层章节编号、名称、元数据字段和语义固定；Project 可以在不改变这些语义的前提下增加更具体内容。
++需要八章格式时使用 [`设计模板`](../assets/architecture-design-template.md)。以系统、模块、数据和共同机制组织；引用对应需求 ID，在可供派生的完整技术章节标题后声明稳定 `<!-- architecture-id: ... -->`。已实现事实与候选方案分开。
+
+ ## 固定状态
+
+@@ -15,12 +15,12 @@
+
+ 不得使用 `confirmed` 表示 Agent 自己确认技术方案，也不得用 `implemented` 表示只完成了文档。
+
+-## 固定顶层章节
++## 设计内容（按实际影响选择）
+
+ 1. **结论与适用性**：一句话说明为什么需要设计、当前状态和主方案。
+ 2. **目标、范围与依据**：产品来源、当前技术证据、范围内、明确不改、Unknown/TBD。
+ 3. **架构驱动因素**：业务不变量、硬约束、可衡量质量场景；普通愿望不进入。
+-4. **整体设计**：固定包含领域与所有权、静态结构、运行交互、状态与数据、部署与运维五个二级章节。每个二级章节必须给出内容或写明“不适用：原因”。
++4. **整体设计**：说明适用的领域与所有权、静态结构、关键运行交互、状态数据及部署运维，不为不适用项生成空章节。
+ 5. **候选方案与取舍**：至少比较真实可行的主方案和一个更简单候选；没有第二个可行方案时说明为什么。
+ 6. **实施、迁移与回滚**：实施顺序、兼容策略、数据或配置迁移、回滚点；不涉及的项标记不适用。
+ 7. **验证与可观测性**：把每个架构驱动因素连接到测试、检查、指标、日志、告警或人工 Review。
+@@ -40,9 +40,9 @@
+
+ ## 完成条件
+
+-- 所有模板占位符已经删除或替换；固定章节没有消失。
++- 所有模板占位符已经删除或替换；适用设计内容明确。
+ - 事实、候选、决定、Unknown 和已实现状态能够明确区分。
+ - 图与文字对同一责任、调用、状态和数据所有权没有冲突。
+-- 每个长期技术决定都有 ADR 链接；多方 RFC 结束后能看到采纳、拒绝或转 ADR 的结果。
++- 长期决定在当前架构明确维护，独立 ADR 仅在 Project 采用该方式时使用；多方 RFC 结束后能看到采纳、拒绝或转 ADR 的结果。
+ - 实现人员无需重新猜测边界、失败恢复、迁移和验证方式。
+-- `python3 scripts/validate_architecture_artifact.py <文件路径>` 通过；该检查只证明固定规格和占位符完整，不证明设计正确。
++- 沿用八章模板时运行 `python3 scripts/validate_architecture_artifact.py <文件路径>`；普通架构核对来源、稳定 ID、语义与引用，派生时另由程序校验可引用性。固定格式通过不能证明设计正确。
+--- a/skills/product-documentation/SKILL.md
++++ b/skills/product-documentation/SKILL.md
+@@ -1,15 +1,15 @@
+ ---
+ name: "product-documentation"
+-description: "统一编写、修订和复核 PRD 与研发 Spec，创建或修改交付页面后必须使用本 Skill 核对 PRD 和 Spec；也用于既有文档标准化、工作台只读投影、映射与查看。本 Skill 不开发页面。"
++description: "编写和修订 PRD，接续独立架构设计并程序派生研发 Spec，处理 Spec 手改后的来源同步，创建或修改交付页面后必须使用本 Skill 核对 PRD 和 Spec；也用于既有文档标准化、工作台只读投影、映射与查看。本 Skill 不开发页面。"
+ ---
+
+ # 产品文档
+
+-由当前 Codex 任务维护 PRD 与 Spec：PRD 定义产品，Spec 承接产品决定和必要工程设计，形成研发可执行说明。默认一个 PRD、一个统一 Spec；既有分模块文档仅在用户授权重组时合并。先确认产物所属 Project、正式入口、本次范围、目标文件及当前确认状态。
++由当前 Codex 任务维护 PRD 与 Spec：PRD 定义产品，架构独立维护技术设计，Spec 按明确来源程序派生并接受手动反馈。默认一个 PRD、一个统一 Spec；既有分模块文档仅在用户授权重组时合并。先确认产物所属 Project、正式入口、本次范围、目标文件及当前确认状态。
+
+ ## HTML 交付与文档同步
+
+-创建或修改交付页面后，必须对照本轮变化依次核对 PRD 和 Spec；通过组件、JS 或 CSS 改变页面同样适用。受影响内容按下文各自方法修订，无需修改的说明依据；两份文档均完成核对、必要修订和一致性检查后，才能宣布本轮完成。文档缺失时按实际范围生成草稿，非产品页面说明不适用；冲突、写入失败或用户明确暂缓时如实说明未完成项。
++创建或修改交付页面后，必须对照本轮变化依次核对 PRD 和 Spec；通过组件、JS 或 CSS 改变页面同样适用。受影响产品内容修订 PRD，技术变化修订独立架构，再按下文方法处理 Spec 待同步手改并重新派生，无需修改的说明依据；两份文档均完成核对、必要修订和一致性检查后，才能宣布本轮完成。文档缺失时按实际范围生成草稿，非产品页面说明不适用；冲突、写入失败或用户明确暂缓时如实说明未完成项。
+
+ HTML 验证按 [Spec 验收与变更影响](references/product-spec.md#36-验收与变更影响)，上报与评审沿插件协议；上报工具不可用也须继续文档核对，不把上报成功当作同步完成。只读查看及构建、测试偶然产物不触发；不自动追加工作台映射。
+
+@@ -20,17 +20,17 @@
+ | 当前任务 | 方法与输出 |
+ |---|---|
+ | 编写、修订、重组 PRD；蓝图迁入；旧 PRD 标准化 | [PRD 标准](references/standard-product-document.md)，更新本批 PRD；按下文复核与评审 |
+-| 编写、局部修订或审阅 Spec | [统一 Spec 方法](references/product-spec.md)，更新本批 Markdown；不要求已有 HTML、投影或工作台 |
++| 派生、刷新 Spec 或同步手改 | [统一 Spec 方法](references/product-spec.md)，读取明确来源并程序派生；有手改先修订源文档；不要求 HTML 或工作台 |
+ | 仅生成或刷新工作台 JSON 投影 | [只读转换](references/projection.md)，保留已有正文；不写文档、不启动内容设计、架构或内容复核流程 |
+ | 打开工作台映射、编辑或只读查看 | [工作台操作](references/mapping-workflow.md)，沿原会话与写入边界；需要转换时才加载转换方法 |
+
+ ## PRD、Spec 与实现的衔接
+
+-正常顺序是 PRD → 工作台评审 → Spec → 已授权实现。已确认范围不重复评审，不要求无关范围冻结；用户要求联合草稿、直接生成 Spec 或暂缓评审时遵从。局部文档修订只处理目标及直接依赖；只请求文档时不开发页面。
++正常顺序是 PRD → 工作台评审 → 本批适用架构设计或复用 → 程序派生 Spec → 已授权实现。已确认范围不重复评审，不要求无关范围冻结；用户要求联合草稿、直接生成 Spec 或暂缓评审时遵从。局部文档修订只处理目标及直接依赖；只请求文档时不开发页面。
+
+ - **PRD 复核与评审。** PRD 首次生成、重构或任何修订后，先按需使用 [prd-concise-cn](../prd-concise-cn/SKILL.md) 保真整理，再读取 [PRD 复核 Agent](agents/prd-reviewer.md)，按其模型、范围和只读权限启动独立子 Agent。原任务修正并交其复核，通过后才能交付、发布批注修订或进入下一阶段。仅格式修订不重跑精简，仍复核改动；正文未变且已有同版本结果可复用。工具不可用或问题未解决时报告，不能以自检替代。用户评审的触发、等待、停止、发布和确认沿已安装插件协议，不另建门禁。
+-- **Spec 编写与复核。** 完整方法、格式及 Spec 独立复核由统一 Spec 方法维护。产品缺口回 PRD 路径补齐，工程缺口补同一 Spec；必要设计按 [架构 Skill](../software-architecture-design/SKILL.md) 执行。生成、作者自检及复核均不等于用户确认。
+-- **实现反馈。** 本批 Spec 足以支撑实现时继续已授权工作。页面反馈改变产品结果，先修订 PRD，再同步 Spec；纯实现调整更新适用工程决定。HTML 完成仍核对两份文档。
++- **Spec 派生与同步。** [统一 Spec 方法](references/product-spec.md) 负责派生与手改回流。产品缺口回 PRD，技术缺口由 [架构 Skill](../software-architecture-design/SKILL.md) 写入独立架构。程序正常派生不调用内容自审或 Spec Reviewer；来源实质修订只复核受影响范围。已存在的非派生 Spec 保持原编辑和适用复核，未经明确迁移不覆盖。
++- **实现反馈。** 本批 Spec 足以支撑实现时继续已授权工作。页面反馈改变产品结果，先修订 PRD，再同步 Spec；纯技术调整更新独立架构中的适用决定。HTML 完成仍核对两份文档。
+
+ ## 写入与完成
+
+--- a/skills/product-documentation/references/product-spec.md
++++ b/skills/product-documentation/references/product-spec.md
+@@ -1,156 +1,29 @@
+-# 统一 Product Spec 标准
++# Product Spec 标准
+
+-本文件统一维护 Spec 编写、正文格式与内容复核。仅编写、修订或审阅 Spec 时完整读取，并读取 [PRD 标题与适用性标准](standard-product-document.md#1-标准标题与内容归属)。仅转换或使用工作台不加载本方法；投影不替代正式 Markdown。
++Spec 保留为可追溯的研发视图和用户反馈入口。产品行为由 PRD 维护，技术设计由独立架构维护；正常生成由程序按明确关联取出原文，不由 Agent 重述产品规则、补造机制或重新拆分页面节点。
+
+-## 编写步骤
++## 首次采用与来源更新
+
+-1. 读取本批 PRD、明确产品决定、已有 Spec、工程来源及可用页面。存在 PRD 时调用插件 `src/prd-service.mjs` 的 `parsePrdMarkdown`；Workspace 使用 `apps/interactive-product-spec/src/prd-service.mjs`。无法调用或工具不兼容时按 PRD 标准自检并说明；本次草稿格式错误按 PRD 路径修复后复查，外部原件与冻结版按该标准保护。只有 HTML 时可形成候选 Spec，不补造未知业务。
+-2. 从用户要求确定功能／模块、页面或全量范围。页面任务须跨 PRD 模块核对该页完整功能，不能以作者选定小节或已有节点缩小范围。功能试写不自动扩大到整页。
+-3. 先承接完整功能及适用整体范围、对象、事实来源、公共规则和未决项，再将必要工程机制落实到实际执行步骤，最后按下文结构划分节点。漏承接直接补回；缺产品决定回 PRD 路径或保留具体未知；缺工程机制在同一 Spec 设计，不推迟到实现或末尾验收。
+-4. 有页面时核对当前源码／构建和实际页面来源、对象及状态，从有效操作反查 PRD 与正文，包含搜索、开关及可达弹层；动态场景不可进入则记录未核对。页面多出或 PRD 已排除的操作，记录差异回产品定义处理，不据按钮确认需求。同页范围外独立功能在既有总览写明名称、PRD 归属和未生成边界，不造占位节点。无页面时按任务及依赖核对。
+-5. 按文末检查完成本批修改。仅格式或链接修订不重新设计；局部修订核对受影响完整功能及依赖，全量生成以当前 PRD 为准保留有效 ID。不另建覆盖台账，不自动派生 JSON、映射或开发页面。
++读取本批 PRD、Project 工程入口及已有架构。PRD 已足以支撑技术设计后，使用 [架构 Skill](../../software-architecture-design/SKILL.md) 明确或复用本批系统、模块、数据与协作决定；产品缺口回 PRD，技术缺口回架构。来源尚不完整时明确范围与未知，派生器不补齐设计。
+
+-## 1. 内容归属与范围
++按 [派生与手改同步合同](spec-derivation.md) 维护一次明确来源绑定，运行程序生成或刷新 Markdown Spec。稳定需求、架构和操作 ID 保留；来源状态、范围及引用变化按源文档方法核对。正文由完整来源引用块呈现，技术设计不伪装成业务节点。自动检查引用、范围声明、原文、结构和版本，不反复执行 Spec 全文内容审核；来源设计及实质修订才审核语义。
+
+-PRD 提供完整产品定义，架构提供必要工程设计，Spec 将两者融合为本批功能的可执行说明。研发应能据此确定输入、条件、执行过程、正常与异常结果、恢复和必要实现机制，而不依赖前期对话。功能正文带入适用的 PRD 决定并记录来源 ID 与固定版本，不独立改义；共享定义集中维护，各操作明确适用条件与实际处理，不以关联链接代替行为。
++原始需求可按功能设计，派生展示可按模块、区域或操作组织；绑定关系是明确源数据，不能在生成时凭页面按钮或关键词猜测。公共内容使用 context 集中引用。源文档中不明确的页面或操作划分，需要先作出并保存设计；不能要求程序推断。
+
+-无 HTML 时根据 PRD 和产品决定设计；已有页面时核对可见行为。页面试做不能反推正式规则，规划路由不能冒充已验证页面。首次覆盖约定范围；局部修订读取目标章节与直接依赖，其余未设计内容明确保留。
++## 手动修订与兼容
+
+-## 2. 元数据与稳定引用
++用户仍可手改 Spec。差异保留到对应 PRD/架构修订并完成候选核对之后，再重新派生。保存不等于同步，派生不等于产品确认。完整路径见派生合同，不要求每次保存启动 Agent。
+
+-沿用现有文档身份；无约定时按实际填写：
++尚未明确迁移的历史 Spec 继续原位编辑、工作台读取和普通/gate 保存；不能套用新派生覆盖已有正文。旧格式实质修订仍按 [既有 Spec 复核 Agent](../agents/spec-reviewer.md) 检查本批来源、语义和工程一致性；纯格式及链接检查改动即可。不得以兼容为由重新启动整份 PRD 的重写。
+
+-```yaml
+-doc_id:
+-title:
+-project:
+-version: v0.1
+-status: draft
+-doc_kind: product-spec
+-delivery_mode: html-product
+-prd_source:
+-prd_version:
+-prd_revision:
+-source_refs:
+-```
++工作台沿现有 MODULE、页面、节点 ID、类型、contentBlocks 与 relation 协议；只有 ACTION/SURFACE 映射 DOM，其他类型供关联阅读。页面可见不证明业务权限或接口成立。JSON 仅为工作台投影，不替代 Markdown，也不用于重建并覆盖全文。需要转换时读取 [projection.md](projection.md)，需要操作工作台时读取 [mapping-workflow.md](mapping-workflow.md)。
+
+-`delivery_mode` 选择 `html-product` 或 `fullstack`。来源基线、范围和确认程度必须明确；无 PRD 时记录真实来源及候选边界，不伪造路径或版本。页面、规则、操作和重要验收项使用稳定 ID；改标题或顺序不改 ID，语义拆分、合并、废弃时处理受影响引用。
++## 3.6 验收与变更影响
+
+-产品状态为 `draft → reviewing → confirmed → superseded`。只有用户或 Project 正式权限主体明确确认相应范围，才能记为 `confirmed`。工程决定按工程章节单独记录状态；文档可解析、方案被采纳和页面可操作都不代表用户确认。
++HTML 交付仍按实际范围完成：
+
+-## 3. 正文结构
++1. 核对受影响源码、模块读写边界、共享对象、复用组件及本批接口/数据影响，修改回唯一维护源。
++2. 重新构建；在独立目录按约定双击或启动方式打开最终文件，检查入口、刷新与返回、代表性完整旅程及关键分支、数据恢复/重置、适用视口和资源；要求离线时断网验证。
++3. 修复影响使用的脚本、资源或网络错误并复测。一次性草图按实际范围裁剪；开发服务可用、文档字段齐全或上报成功不能代替验证。
+
+-同一文件组织以下六部分；已有文档按本次范围修订，不为套用结构重建全文。只写适用内容，不留无意义空表。
+-
+-### 3.1 适用范围与来源基线
+-
+-写明本批产品结果、范围与非范围、PRD 基线、已有页面或源码版本、候选和仿真边界。背景与对象语义回链 PRD。未知就地写明问题、当前处理、影响及解决所需的决定或证据。
+-
+-### 3.2 页面与模块依赖总览
+-
+-全局页面清单只维护一次，后文用页面 ID 引用。同一职责和业务上下文的多入口共用页面；不同页面说明职责差异。登记表分别使用“页面 ID”“职责”“路由”列，源文件、导航及 DOM 关联按需另列，不合成一列；无实际页面时路由仍标为拟定。
+-
+-| 信息 | 内容 |
+-|---|---|
+-| 页面身份 | 稳定 ID、职责、主责能力、独立页面或页内场景、复用关系、设计依据和确认状态 |
+-| 导航 | 入口、对象身份及参数、去向、返回、直接打开、刷新和上下文缺失时的行为；弹层和临时编辑不强制成为路由 |
+-| 布局与复用 | 能说明实际位置的功能线框或已确认布局引用、主要区域、公共页面壳与组件、允许差异 |
+-| 模块协作 | 提供者、消费者、输入对象或状态、读取与修改边界、输出事实、影响范围、失败反馈 |
+-
+-模块与页面不强制一一对应，菜单或代码目录不能代替职责与依赖说明。拟定导航须标明设计状态，不据此确认页面映射。
+-
+-### 3.3 公共约束
+-
+-仅集中被多处使用且对象、条件、例外相同的约束。沿用 [PRD 标准](standard-product-document.md#1-标准标题与内容归属) 中适用的产品标题与规则定义，保留稳定规则 ID、来源、适用范围和例外，不另设缩减字段清单。
+-
+-共享产品定义带入具体对象、状态、字段和规则；共享工程机制在工程章节维护。各功能在相应标题下写本次具体处理与差异并精确引用，不复制整段公共定义，也不让研发自行筛选哪些规则适用。
+-
+-### 3.4 页面、区域和操作说明
+-
+-按 [PRD 标准](standard-product-document.md#1-标准标题与内容归属) 承接完整功能，再按“业务模块 → 页面/场景 → 区域与操作”组织实现说明。保留跨页面任务的连续步骤与交接，明确同页各操作的功能归属；页面和节点划分不反向改变 PRD 功能边界。产品标题、适用条件和必答内容以该标准为准，不另设缩减清单。
+-
+-#### 产品定义的继承
+-
+-- 本批 PRD 的适用标题及其具体设计必须落入 Spec 对应功能，包括正常流程、条件分支、数据、状态、权限、保存、退出和各类异常与边界。整体层面的角色、对象、事实来源、主链及质量要求也须落实到实际功能；背景说明可回链，执行所需的定义不能省略。
+-- 按相同标准标题组织功能正文，保留 PRD 的具名分支及条件、反馈、数据与状态结果、继续或恢复位置。简单功能只选少量适用标题，标题下可短写；不能退化成没有分类的单句“产品结果”。复杂功能按标准标题展开具体场景，不合并成通用“异常处理”。
+-- 一项 PRD 功能可对应多个区域和操作节点，按责任分配标题内容；同一功能共享的字段与展示可在区域说明集中，动作流程与分支写在对应操作。划分节点不能拆散完整任务；各操作须可直接读出本次适用条件与处理，不能要求研发从一组公共链接自行拼接行为。
+-- 共用规则正文维护一处，各功能在相应标准标题下写明本次对象、条件、处理结果及局部差异，再引用精确条款。PRD 仍拥有产品决定，Spec 为执行而带入这些决定；PRD 修改后同步对应内容，不能各自改变语义。
+-- 缺失但适用的产品内容回产品文档流程补齐或就地标明具体未知，不能由工程假定补上，也不能以未实现为由删除。
+-
+-#### 工程机制的融合
+-
+-在承接产品设计的同时，按 [Spec 工程约束](../../software-architecture-design/references/product-engineering.md) 选择并设计机制。功能正文在对应标准标题下直接写出：使用哪个对象及操作身份，由哪个模块或状态所有者处理，先做什么再做什么，以什么事实确认生效，各分支怎样查询、重试、终止或恢复。技术合同与取舍集中在工程章节，引用注明具体决定或条款。
+-
+-例如“保存与生效”须同时说明 PRD 规定的保存时机与可见结果，以及本功能采用的提交、持久化确认和重读方式；“结果未知”须同时说明待核实状态、允许的后续动作和查询原操作的机制；“部分完成”则落到逐项结果与仅恢复未完成部分的机制。这里只说明两层如何融合，不预设所有功能都使用这些机制。
+-
+-HTML 模式明确内存、会话或本地持久化的实际仿真行为；完整开发明确真实写入和查询依据。成功提示本身不能作为保存证明。发生产品行为变化先反馈 PRD，再更新 Spec；技术细节不能悄悄改变恢复、权限或其他产品规则。
+-
+-### 3.5 工程实现约束
+-
+-在形成功能定义时，当前 Codex 任务依据 [架构 Skill](../../software-architecture-design/SKILL.md) 判断所需机制，按其 [Spec 工程约束](../../software-architecture-design/references/product-engineering.md) 复用或设计并写入同一章节。已有架构必须应用到本批功能；架构章节存在本身不代表融合完成。
+-
+-工程说明不转换为业务节点；操作在对应产品标题下写明实际采用的机制与执行步骤，再引用工程细则。局部交互修订只核对受影响工程决定，不重做整套架构。Project 已明确采用独立架构入口时引用该入口，不保存两套当前决定。
+-
+-### 3.6 验收与变更影响
+-
+-关键验收关联需求或操作 ID，写清前置条件、动作、可观察结果、必要数据变化与验证方式。简单操作就地说明，不为每次自检建立独立 AC 节点。
+-
+-HTML 交付由当前 Codex 任务完成以下检查：
+-
+-1. 复核受影响源码：页面职责是否重复，模块是否越权写入，共享对象是否一致，组件是否重复实现，源码与产物是否混改；本批接口、数据或部署影响一并检查。
+-2. 重新构建，将最终文件复制或解压到独立目录，按约定的双击或启动方式实际打开。检查入口、刷新与返回、代表性旅程及关键分支、共享数据与重置、适用状态、目标视口和资源完整性；要求离线时断网验证。
+-3. 修复影响本次使用的脚本、资源或网络错误后复测。开发服务可用、文档字段齐全或上报成功不能代替这些检查；一次性草图按实际范围裁剪。
+-
+-完整开发验证页面、服务端、持久化、重新查询和部署环境的贯通。变更影响列出实际受影响的模块、页面、规则、对象、组件、接口和验收，使用局部引用，不复制运行日志或另建追踪总账。
+-
+-## 4. 节点格式与引用
+-
+-业务行为按“业务模块 → 页面/场景 → 节点”编写。模块用二级 `## MODULE ` 后接反引号 ID、冒号及名称，与总览、公共约束、工程章节并列。节点标题使用类型与稳定 ID，不能省略机器标记；页面身份在全局总览维护，节点引用页面 ID。
+-
+-| 类型 | 内容 |
+-|---|---|
+-| `SURFACE` | 区域展示、字段及共同输入要求 |
+-| `ACTION` | 独立操作的条件、反馈、去向、数据与状态结果 |
+-| `RULE` / `PERMISSION` | 共用规则与权限 |
+-| `STATE` / `EVENT` | 状态迁移、不变量及能力间事件 |
+-| `EXTERNAL` | 外部依赖结果及责任边界 |
+-| `AC` | 需独立复用的验收结果 |
+-| `TBD` | 具体问题、影响和当前处理 |
+-
+-- 实际存在的独立新增、搜索、筛选、输入、切换、提交、取消和返回均须覆盖。重复数据行共用操作，装饰与纯文本不建节点；成功、失败、禁用和具体分支留在同一操作，不按分支增建 DOM 节点。
+-- 仅 ACTION／SURFACE 可映射 DOM。工程目录、组件实现、接口、构建部署和技术取舍留在工程章节；原型未实现的要求仍保留并注明页面未承载。
+-- 每个节点就地声明“状态”和“来源”。来源使用 `observed-ui / product-decision / formal-source / candidate / simulation / tbd`，不只在章首声明；有 PRD 依据写“关联 PRD”及反引号章节 ID，页面引用写“页面”及反引号 ID。无依据时说明实际来源，不伪造引用。
+-- 共用约束须以“关联”和反引号节点 ID 直接关联所有适用节点，仅同模块不算关联。只在对象、条件、例外相同时合并；引用精确条款，不按关键词批量挂规则，操作仍写本次具体处理。
+-- 节点内用适用产品标准五级标题，具体场景用六级标题；步骤、短句或条件结果表均可。共享字段和展示集中于所属区域，动作与分支归对应操作，不在每个节点复制完整功能。
+-
+-下面只示范格式：假设用户已决定未提交的编辑无需二次确认、无自动保存。不得用此假设覆盖正在提交等其他场景；示例 ID 须换为实际存在的引用。
+-
+-```markdown
+-## MODULE `RECORD`：记录
+-
+-### 页面：记录详情（`PAGE-RECORD`）
+-
+-#### ACTION `RECORD-CANCEL`：放弃未提交编辑
+-
+-- 状态：`draft`
+-- 来源：`candidate`
+-- 关联 PRD：`需求-记录-编辑`
+-- 页面：`PAGE-RECORD`
+-
+-##### 入口与前置条件
+-编辑弹层已打开，用户点击取消，尚未发起提交。
+-
+-##### 正常流程与结果
+-关闭弹层回原记录详情，清除弹层的临时编辑副本，不调用写入接口；已保存记录不变。状态归属见工程决定 `ENG-EDIT-STATE`。
+-
+-##### 取消、返回与再次进入
+-关闭图标执行相同处理，无需二次确认。再次打开从当前已保存记录建立副本，不恢复丢弃的修改。
+-```
+-
+-## 5. 内容复核与完成
+-
+-1. **作者自审。** 从用户范围及页面操作反查正文，对照来源检查条件、动作、结果、例外及新增机制依据。按 [逐功能复读方法](standard-product-document.md#5-交付检查) 推演正常任务和改变结果或恢复的分支，核对功能、公共约束、工程及验收一致；验收不能首次定义行为，标题和 ID 不证明覆盖。
+-2. **独立复核。** 生成或实质内容修订完成自审后，启动 [只读 Spec 复核 Agent](../agents/spec-reviewer.md)。修正后复核受影响完整功能和关联规则；实质问题未解决或外审未完成，不标为通过。纯格式、链接修改只检查改动及语义保留，不扩大外审。
+-3. **交付程度。** 在既有验收与变更影响说明哪些行为和机制足以进入本批研发、哪些仅支持已授权仿真、哪些尚缺具体产品决定或工程合同。局部缺口不阻断无关功能；不把整个功能标为可真实接入，开发仍可决定不改变行为的代码细节。不另建交接台账或 Schema。
+-
+-固定来源版本，保留无关正文、稳定 ID、图片、链接、人工 Map、工程状态及未决项；来源变化后重新核对。分别说明本批功能和所涉页面的覆盖程度。文档修订检查正文与引用，需要工作台时再核对节点、关联和全文是否可读；Markdown 通过不证明投影留存全文。格式、内容复核、构建运行、部署和用户确认分别报告，仿真、未确认及未运行不能记为通过；复核只对本次版本和范围有效。
++完整开发检查页面、服务端、持久化、重新查询和适用部署环境。验收依据来自 PRD 的产品结果及架构对关键机制的验证要求，关联具体来源；不在派生时新增验收业务规则。页面变更后沿 Skill 主入口核对 PRD、适用架构和 Spec；分别报告实际结果、未知、仿真与确认程度。
+--- /dev/null
++++ b/skills/product-documentation/references/spec-derivation.md
+@@ -0,0 +1,63 @@
++# Spec 程序派生与手改同步
++
++只在派生或同步已采用本合同的 Spec 时读取。普通映射、PRD 批注和旧 Spec 保存沿原流程；历史文档先明确迁移绑定，不能直接覆盖。程序在插件 src/spec-derivation.mjs，入口为随包 scripts/cli.mjs；Workspace 使用 apps/interactive-product-spec/cli.mjs。
++
++## 来源合同
++
++PRD 拥有产品规则，架构拥有技术设计。源章节使用稳定 ID，紧随所属标题：PRD 沿用 `<!-- prd-section-id: 需求-… -->`；整体说明或操作子章节需要单独引用时可使用 `<!-- spec-source-id: … -->`；架构使用 `<!-- architecture-id: … -->`。引用取该标题到下一个同级或更高级标题前的完整原文，不按关键词截取，不由程序新增设计。
++
++PRD 中仅维护一个以下 JSON 注释。它登记输出身份和明确关联，不重复业务正文；节点来自源文档中已明确的操作或区域，已有 ID 必须复用。程序不会从一个功能段落自行推导多个按钮节点。架构仍按系统、模块与共同机制组织，不按这些输出节点拆成多个设计。
++
++```markdown
++<!-- spec-view
++{
++  "version": 1,
++  "product": {"id":"HELP","title":"帮助产品 Spec","version":"v1","status":"draft"},
++  "modules": [{"id":"HELP","title":"帮助"}],
++  "pages": [],
++  "nodes": [{
++    "id":"HELP-OPEN","type":"ACTION","title":"查看说明","moduleId":"HELP",
++    "status":"draft","sourceKind":"product-decision",
++    "prd":["需求-帮助-说明"],"architecture":["HELP-STATE"]
++  }],
++  "context":{"prd":[],"architecture":[]},
++  "excluded":{"prd":{},"architecture":{}}
++}
++-->
++```
++
++- 节点类型、状态和来源枚举沿现有工作台合同。`prd`、`architecture` 为精确来源 ID；`relations` 为可选节点 ID 数组，`pageId` 为可选已登记页面 ID。不通过同模块或名称相似补关联。
++- `context` 引用整体产品定义、公共规则或共同技术设计，完整展示一次；`excluded` 用“ID: 本批范围外原因”明确不纳入部分。所有已标记来源须引用或明确排除；未标记正文会拒绝生成，但该检查不能证明关联语义已经完整，首次标记及实质变更仍按源文档方法复核。
++- 页面项为 `id/title/htmlPath`，可选 `routeHints/anchorHints/parentPageId`。`htmlPath` 必须指向当前 Project 中实际存在的 HTML；文件存在仅证明有页面来源，不证明页面行为或路由已经验证。拟定页面留在架构，不放入 pages。没有页面不阻断派生。
++- 来源身份与确认状态不因派生升级；Spec 总体保持草稿，源节点的状态来自明确声明。
++
++## 正常派生
++
++`node <cli.mjs> derive-spec --project <Project> --prd <PRD.md> --architecture <架构.md> --output <Spec.md>`
++
++输出目录可按需创建。程序取出完整来源，将相对图片和链接地址换算到输出位置，保留其语义，生成可供现有工作台读取的 Markdown；不写 PRD、架构、HTML 或 Map。工具数据沿现有 IPS_HOME/工具目录保存基线；可使用 `--state <工具状态路径>` 指定同一隔离工具目录。基线是同步恢复数据，不能随意清理；遗失时保留 Spec，不能假定它没有手改。
++
++首次不能覆盖已有目标；迁移须先明确现有来源和节点对应，候选输出核对后再按 Project 约定切换唯一当前入口，保护旧文件和人工 Map。普通派生不运行 Agent 内容自审和 Spec Reviewer；程序校验通过只证明转换合同成立。
++
++## 手改与 Agent 同步
++
++1. 正常保存 Spec，包括工作台直接写回、gate 原流程应用补丁或外部编辑器保存。原来源文档和人工 Map 不随之自动改变，也不立即启动 Agent。
++2. 执行 `node <cli.mjs> spec-changes --project <Project> --spec <Spec.md>`。返回本次 Spec revision、源文件路径和版本、每项 changeId/nodeId/before/after 及来源关系。程序用当前文件和持久基线恢复差异，不需要截获每次保存。
++3. 当前任务 Agent 读取差异及对应完整功能/技术设计和必要依赖。产品变化修订 PRD，技术变化修订架构；新内容或混合变化先明确归属。只有显示编排变化时修订来源声明或派生器的适用规则，不能把业务规则塞进声明。保护冻结版；需按原生命周期派生新来源文件时，本版须明确迁移，不能沿旧基线自动换源。原确认语义不扩大。
++4. 按源文档方法仅复核受影响范围。执行同一 derive-spec 命令加 `--preview`，读取候选 text 与变化，核对用户改动是否已由来源承接；缺失、不采纳或发生冲突的修改保持待同步，不擅自当成已解决。
++5. 再次读取 spec-changes，基于最新版本形成临时同步回执，随后用 `derive-spec … --receipt <回执.json>` 发布。回执结构如下，每项都必须有具体承接依据；它是任务的同步记录，不是审批表或产品确认。
++
++```json
++{
++  "specRevision":"当前手改Spec的SHA256",
++  "candidateRevision":"预览返回的candidateRevision",
++  "sourceRevisions":{"prd":"修订后PRD的SHA256","architecture":"当前架构的SHA256"},
++  "resolutions":[{"changeId":"差异的changeId","updatedSources":[{"kind":"prd","id":"需求-帮助-说明"}],"reason":"已在对应功能修订该条件，预览保持本次用户结果"}]
++}
++```
++
++Spec、PRD 或架构版本变化、回执漏项、候选未核对或声称修改的具体来源块未变时，拒绝覆盖。同步过程中新增的手改仍保留；源文档部分修订成功而后续失败时报告各自状态，保留差异后继续。程序不能证明 reason 的语义正确，Agent 须实际核对预览；不重新评审未变化全文。
++
++没有待同步手改时源更新可直接重新派生。有待同步手改时不提供强制覆盖；来源丢失、无基线、ID 不明确或发布中断且出现额外修改时停止受影响写入并说明恢复所需依据。工具不扫描未选文件，不在 Stop 或目录变化时猜测交付。
++
++发布时保留一个 `.derivation-previous` 恢复副本，并在工具状态中记录其版本；它不作为产品文档入口。外部同时保存时不覆盖新文件，保留差异或恢复副本并报告冲突。处理冲突后再继续；不得自行清除遗留锁或恢复副本来绕过保护。
+--- a/skills/product-documentation/references/standard-product-document.md
++++ b/skills/product-documentation/references/standard-product-document.md
+@@ -107,7 +107,7 @@
+
+ ```
+
+-这是局部层级示例；ID 替换为实际业务语义，全文仍按适用整体章节组织。复杂功能在适用五级标准标题下，以六级业务场景名区分处理，例如“依赖失败与超时”下的“查询服务不可用”；场景必须写具体路径，不能只有标题。操作或场景不因成为六级标题而单独生成需求 ID；是否具有独立页面身份由 Spec 的页面职责与导航设计确定。
++这是局部层级示例；ID 替换为实际业务语义，全文仍按适用整体章节组织。复杂功能在适用五级标准标题下，以六级业务场景名区分处理，例如“依赖失败与超时”下的“查询服务不可用”；场景必须写具体路径，不能只有标题。操作或场景不因成为六级标题而单独生成需求 ID；是否具有独立页面身份由产品与架构中已明确的页面职责和导航设计确定，Spec 按来源登记。
+
+ ## 2. 表达与取舍
+
+--- a/skills/product-documentation/agents/openai.yaml
++++ b/skills/product-documentation/agents/openai.yaml
+@@ -1,4 +1,4 @@
+ interface:
+   display_name: "产品文档"
+-  short_description: "统一编写与复核 PRD 和研发 Spec，接续评审、文档同步及工作台"
+-  default_prompt: "使用 $product-documentation 按本次范围编写或修订 PRD、研发 Spec，并按授权接续评审、HTML 文档同步或工作台；仅转换时保持只读。"
++  short_description: "维护 PRD 与派生 Spec，接续独立架构、手改同步及工作台"
++  default_prompt: "使用 $product-documentation 按本次范围维护 PRD、引用独立架构并派生 Spec；手改先记录差异再回源同步，并按授权接续评审、HTML 文档同步或工作台；仅转换时保持只读。"
+--- a/skills/product-documentation/agents/spec-reviewer.md
++++ b/skills/product-documentation/agents/spec-reviewer.md
+@@ -1,10 +1,10 @@
+ # 共享 Spec 复核子 Agent
+
+-只读复核 Spec。由原任务启动独立上下文的子 Agent，提供 Project 根、PRD 与 Spec 路径和版本、本批范围、用户要求及必要工程来源；初审不提供作者自检或历史复核结论。复核方法使用[统一 Spec 方法](../references/product-spec.md)及其引用的 PRD 标准。
++只读复核尚未迁移的手写 Spec；程序派生不调用本 Agent。由原任务启动独立上下文的子 Agent，提供 Project 根、PRD 与 Spec 路径和版本、本批范围、用户要求及必要工程来源；初审不提供作者自检或历史复核结论。复核方法使用[统一 Spec 方法](../references/product-spec.md)及其引用的 PRD 标准。
+
+ ## 方法与权限
+
+-1. 先按统一 Spec 方法的“编写步骤”从用户要求及可用页面独立检查覆盖边界，不以作者选定的 PRD 小节或已有节点作为检查全集；区分本批遗漏与同页范围外功能，后者须明确披露而非强制扩写。再独立读取本批完整功能及适用的整体范围、对象、事实来源、公共规则和未决项，逐条核对 Spec 的条件、动作、结果与例外，再反查擅增或改义。不能以作者覆盖表、标题或 ID 代替正文核对。
++1. 先从用户要求、当前产品来源及可用页面独立检查本批覆盖边界，不以作者选定的 PRD 小节或已有节点作为检查全集；区分本批遗漏与同页范围外功能，后者须明确披露而非强制扩写。再独立读取本批完整功能及适用的整体范围、对象、事实来源、公共规则和未决项，逐条核对 Spec 的条件、动作、结果与例外，再反查擅增或改义。不能以作者覆盖表、标题或 ID 代替正文核对。
+ 2. 只用成稿及精确引用推演正常任务和改变结果的分支，检查必要机制能否兑现产品要求、各节是否矛盾。PRD、架构、HTML 和代码仅作只读依据；旧文档、页面实现不覆盖当前决定。
+ 3. 报错前回读完整定义，排除已定义内容、措辞偏好和不适用要求。漏承接、缺产品决定、工程缺口分别判断；已有处理边界的待确认合同不自动判错，不用新增权限、状态或流程替代等价澄清。
+
+--- a/system-architecture/model/relationships.json
++++ b/system-architecture/model/relationships.json
+@@ -190,7 +190,7 @@
+       "kind": "flow",
+       "layout": "ordered",
+       "reader_question": "这个 Project 现在走到哪一段，上下游不能丢什么？",
+-      "description": "PRD 先形成可独立评审的完整产品定义，经本批工作台评审后，Spec 融合产品决定与必要架构设计，再进入已授权实现。用户明确要求联合草稿或暂缓评审时保留实际状态；不要求无关范围冻结。",
++      "description": "PRD 明确产品要求并按授权评审后，设计或复用独立架构，再由程序派生 Spec 进入已授权实现。手改 Spec 先记录差异并修订来源；联合草稿或暂缓评审保留原状态。",
+       "parent": "stage-scope",
+       "sources": [
+         "skills/product-documentation/SKILL.md",
+@@ -219,8 +219,14 @@
+           "requirement": "正常流程在 Spec 生成前"
+         },
+         {
+-          "title": "统一 Spec · 行为、工程与验收",
+-          "description": "按完整功能将 PRD 决定与必要工程机制融合为条件、过程、结果和恢复，再组织页面与节点；已有架构须实际应用，没有 HTML 也能设计。",
++          "title": "独立架构 · 实施机制",
++          "description": "依据本批 PRD 和现有工程，确定系统、模块、数据与共同机制；已有设计足够则复用，技术变化影响产品结果时先反馈 PRD。",
++          "target": "#/skill/software-architecture-design",
++          "requirement": "PRD 足以支撑设计后、Spec 派生与实现前"
++        },
++        {
++          "title": "统一 Spec · 可追溯研发视图",
++          "description": "程序按明确来源引用 PRD 和独立架构原文；不由 Agent 重写业务。有手改先回源修订并核对候选，历史 Spec 未迁移沿原流程。",
+           "target": "#/skill/product-documentation",
+           "requirement": "用户请求 Spec、已授权实现前需要完善 Spec，或维护已有 Spec 时"
+         },
+@@ -244,13 +250,13 @@
+         },
+         {
+           "title": "上线与运行",
+-          "description": "需要部署时完成发布、配置、监控、告警、备份恢复与回滚，约束仍回同一 Spec 工程章节；具体源码、配置和运行证据留在实施入口。",
++          "description": "需要部署时完成发布、配置、监控、告警、备份恢复与回滚，技术约束回独立架构并派生到 Spec；具体源码、配置和运行证据留在实施入口。",
+           "target": "#/view/stage-writeback",
+           "requirement": "本次包含正式部署时"
+         },
+         {
+           "title": "演进与局部修订",
+-          "description": "整体产品变化回 PRD，行为和工程变化回 Spec，实现回源码与测试。下一轮读取目标章节及直接依赖；按当前阶段加载方法，不重读无关模块，也不因局部 Spec 修订启动工作台。",
++          "description": "产品变化回 PRD，技术变化回独立架构，Spec 手改先留差异、修订来源后再派生；实现回源码与测试，局部变化不重写无关全文。",
+           "target": "#/view/stage-writeback",
+           "requirement": "后续变化时"
+         }
+@@ -363,7 +369,7 @@
+       "id": "skill-collaboration",
+       "title": "Skill 协作",
+       "kind": "collaboration",
+-      "description": "按一件具体任务，看产品文档、交互 Spec 与架构设计怎样衔接；主线、条件和返回在同页展开。",
++      "description": "按具体任务查看产品文档、独立架构和 Spec 派生怎样衔接；手改回源、主线和条件在同页展开。",
+       "parent": "home",
+       "default_scenario": "spec-edit",
+       "scope_note": "首批样板：共享文档与架构方法。这里解释现行规则，不代表某次任务已经执行；具体由谁来做，仍按所属 Project 的分工。",
+@@ -386,7 +392,8 @@
+         "skills/software-architecture-design/assets/rfc-template.md",
+         "skills/prd-concise-cn/SKILL.md",
+         "skills/product-documentation/agents/spec-reviewer.md",
+-        "skills/product-documentation/references/standard-product-document.md"
++        "skills/product-documentation/references/standard-product-document.md",
++        "skills/product-documentation/references/spec-derivation.md"
+       ],
+       "evidence": {
+         "arch-entry": {
+@@ -395,11 +402,11 @@
+         },
+         "arch-route": {
+           "path": "skills/software-architecture-design/SKILL.md",
+-          "quote": "独立架构任务没有产品 Spec"
++          "quote": "通常使用 [架构设计标准](references/architecture-design-standard.md)"
+         },
+         "arch-help": {
+           "path": "skills/software-architecture-design/SKILL.md",
+-          "quote": "方法包维护才读取"
++          "quote": "仅查看、映射或程序转换不触发新设计。"
+         },
+         "arch-dimensions": {
+           "path": "skills/software-architecture-design/references/product-engineering.md",
+@@ -407,11 +414,11 @@
+         },
+         "arch-writeback": {
+           "path": "skills/software-architecture-design/references/product-engineering.md",
+-          "quote": "将机制落实到 Spec 对应功能的标准标题下"
++          "quote": "独立架构维护接口合同、共同机制及必要的适用条件与执行顺序，并通过需求 ID 说明适用范围。"
+         },
+         "arch-feedback": {
+           "path": "skills/software-architecture-design/references/product-engineering.md",
+-          "quote": "将本次产品决定写回 PRD 并保留实际确认状态，再同步 Spec 的对应功能与工程决定。"
++          "quote": "将本次产品决定写回 PRD 并保留实际确认状态，再更新架构并重新派生受影响 Spec。"
+         },
+         "arch-methods": {
+           "path": "skills/software-architecture-design/references/method-selection.md",
+@@ -419,11 +426,11 @@
+         },
+         "arch-artifacts": {
+           "path": "skills/software-architecture-design/references/artifact-lifecycle.md",
+-          "quote": "完整读取所选标准和模板。"
++          "quote": "普通产品任务在一份独立架构设计维护技术决定，Spec 为其派生视图。"
+         },
+         "arch-design": {
+           "path": "skills/software-architecture-design/references/architecture-design-standard.md",
+-          "quote": "每个二级章节必须给出内容或写明“不适用：原因”。"
++          "quote": "普通任务按实际需要使用下述设计内容，不强制八章模板、空栏或独立 ADR。"
+         },
+         "arch-decisions": {
+           "path": "skills/software-architecture-design/references/decision-record-standard.md",
+@@ -443,19 +450,19 @@
+         },
+         "spec-readonly": {
+           "path": "skills/product-documentation/SKILL.md",
+-          "quote": "产品缺口回 PRD 路径补齐，工程缺口补同一 Spec"
++          "quote": "产品缺口回 PRD，技术缺口由"
+         },
+         "spec-input": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "读取本批 PRD、明确产品决定、已有 Spec、工程来源及可用页面。"
++          "quote": "读取本批 PRD、Project 工程入口及已有架构。"
+         },
+         "prd-repair": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "本次草稿格式错误按 PRD 路径修复后复查，外部原件与冻结版按该标准保护。"
++          "quote": "产品缺口回 PRD，技术缺口回架构。"
+         },
+         "spec-check": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "按文末检查完成本批修改。仅格式或链接修订不重新设计"
++          "quote": "自动检查引用、范围声明、原文、结构和版本，不反复执行 Spec 全文内容审核"
+         },
+         "prd-start": {
+           "path": "skills/product-documentation/references/standard-product-document.md",
+@@ -463,7 +470,7 @@
+         },
+         "prd-gate": {
+           "path": "skills/product-documentation/SKILL.md",
+-          "quote": "正常顺序是 PRD → 工作台评审 → Spec → 已授权实现。"
++          "quote": "正常顺序是 PRD → 工作台评审 → 本批适用架构设计或复用 → 程序派生 Spec → 已授权实现。"
+         },
+         "implementation-gate": {
+           "path": "skills/product-documentation/SKILL.md",
+@@ -471,19 +478,19 @@
+         },
+         "architecture-product": {
+           "path": "skills/software-architecture-design/SKILL.md",
+-          "quote": "核对产品行为能否兑现；技术选择影响用户可见结果时，按工程约束的反馈方式修订 PRD。"
++          "quote": "技术方案改变可用动作、保存结果、权限或其他产品结果时，先反馈并修订 PRD，保留实际确认状态。"
+         },
+         "architecture-spec": {
+           "path": "skills/software-architecture-design/SKILL.md",
+-          "quote": "依据本批 PRD 适用内容设计必要机制；在功能对应标准标题下写明实际执行步骤及分支，不能只挂架构链接。"
++          "quote": "架构负责共同技术方案及必要实施机制。不能把尚未设计的技术细节交给派生器临时推理。"
+         },
+         "spec-fusion": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "再将必要工程机制落实到实际执行步骤，最后按下文结构划分节点。"
++          "quote": "正文由完整来源引用块呈现，技术设计不伪装成业务节点。"
+         },
+         "spec-function": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "划分节点不能拆散完整任务；各操作须可直接读出本次适用条件与处理"
++          "quote": "原始需求可按功能设计，派生展示可按模块、区域或操作组织；绑定关系是明确源数据"
+         },
+         "architecture-skip": {
+           "path": "skills/software-architecture-design/SKILL.md",
+@@ -495,11 +502,11 @@
+         },
+         "html-verify": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "重新构建，将最终文件复制或解压到独立目录，按约定的双击或启动方式实际打开。"
++          "quote": "重新构建；在独立目录按约定双击或启动方式打开最终文件"
+         },
+         "html-retest": {
+           "path": "skills/product-documentation/references/product-spec.md",
+-          "quote": "修复影响本次使用的脚本、资源或网络错误后复测。"
++          "quote": "修复影响使用的脚本、资源或网络错误并复测。"
+         },
+         "html-trigger": {
+           "path": "skills/product-documentation/SKILL.md",
+@@ -515,7 +522,7 @@
+         },
+         "html-prd": {
+           "path": "skills/product-documentation/SKILL.md",
+-          "quote": "受影响内容按下文各自方法修订，无需修改的说明依据"
++          "quote": "受影响产品内容修订 PRD，技术变化修订独立架构"
+         },
+         "html-spec": {
+           "path": "apps/interactive-product-spec/src/html-delivery-session.mjs",
+@@ -576,6 +583,14 @@
+         "spec-review": {
+           "path": "skills/product-documentation/agents/spec-reviewer.md",
+           "quote": "不修改文件、映射或发布/确认状态。"
++        },
++        "spec-manual": {
++          "path": "skills/product-documentation/references/spec-derivation.md",
++          "quote": "程序用当前文件和持久基线恢复差异，不需要截获每次保存。"
++        },
++        "spec-preview": {
++          "path": "skills/product-documentation/references/spec-derivation.md",
++          "quote": "核对用户改动是否已由来源承接"
+         }
+       },
+       "actions": [
+@@ -663,16 +678,16 @@
+         },
+         {
+           "id": "arch-integrate",
+-          "title": "按当前阶段写回产品文档",
+-          "summary": "PRD 阶段反馈影响产品结果的判断；Spec 阶段把机制写到实际功能。",
++          "title": "架构独立成文并反馈产品",
++          "summary": "技术机制写入独立架构；改变产品行为的决定先修订 PRD，Spec 按明确引用派生。",
+           "method": "software-architecture-design",
+           "reads": [
+             "本批产品决定、机制、图表与既有正式入口"
+           ],
+           "writes": [
+-            "PRD：影响用户行为的产品决定；Spec：对应功能步骤与共享工程定义"
+-          ],
+-          "boundary": "PRD 讨论中的技术候选可留在当前任务，不提前创建整份 Spec；共享机制完整定义一次，功能仍写具体用法。",
++            "独立架构中的适用设计；必要的 PRD 产品修订"
++          ],
++          "boundary": "架构按系统、模块、对象与共同机制组织；Spec 不再维护第二套决定。",
+           "evidence": [
+             "architecture-product",
+             "architecture-spec",
+@@ -681,8 +696,8 @@
+           "references": [
+             {
+               "path": "skills/software-architecture-design/references/product-engineering.md",
+-              "when": "产品反馈和 Spec 融合时",
+-              "purpose": "写明输入、责任方、先后、成功依据和恢复；共享定义与取舍进入同一 Spec 工程章节。"
++              "when": "技术成文与产品反馈时",
++              "purpose": "技术机制独立维护；产品变化反馈 PRD，Spec 引用完整来源。"
+             }
+           ]
+         },
+@@ -713,7 +728,7 @@
+         {
+           "id": "arch-file-select",
+           "title": "按信息选择独立产物",
+-          "summary": "已有独立路径或用户明确要求独立架构任务时，先判断需要保存什么信息。",
++          "summary": "先沿 Project 当前架构入口维护；只有实际需要独立 ADR 或 RFC 时再选择相应文件。",
+           "method": "software-architecture-design",
+           "reads": [
+             "任务目标、Project 既有架构入口"
+@@ -721,7 +736,7 @@
+           "writes": [
+             "独立设计或决定的目标路径；只讨论的候选留在当前任务"
+           ],
+-          "boundary": "没有 Spec 并不自动触发独立文件；进度回 Project Progress，已验证事实回既有 ARCHITECTURE 入口。",
++          "boundary": "普通任务一份当前架构即可；Progress 不承载架构事实。",
+           "evidence": [
+             "arch-artifacts",
+             "arch-route"
+@@ -760,7 +775,7 @@
+         {
+           "id": "arch-file-design",
+           "title": "编写整体设计",
+-          "summary": "按独立八章规格说明边界、方案、取舍、实施与验证。",
++          "summary": "按适用范围说明责任、机制、取舍、实施与验证，不强制八章或空表。",
+           "method": "software-architecture-design",
+           "reads": [
+             "当前要求和工程证据"
+@@ -768,7 +783,7 @@
+           "writes": [
+             "Architecture Design；实际长期决定按所用标准关联 ADR"
+           ],
+-          "boundary": "模板固定章节须完整，内部不适用项说明原因；采纳方案不代表已实现。",
++          "boundary": "只有沿用八章格式时才读取模板和运行相应结构校验；采纳不等于实现。",
+           "evidence": [
+             "arch-design"
+           ],
+@@ -776,11 +791,11 @@
+             {
+               "path": "skills/software-architecture-design/references/architecture-design-standard.md",
+               "when": "需要指导实现的独立整体设计时",
+-              "purpose": "确定八章内容、图的要求及完成条件。"
++              "purpose": "按实际影响选择设计内容和验证，不强制八章。"
+             },
+             {
+               "path": "skills/software-architecture-design/assets/architecture-design-template.md",
+-              "when": "编写独立 Design 时",
++              "when": "沿用八章格式时",
+               "purpose": "承载所选标准，替换占位符后交付检查。"
+             },
+             {
+@@ -879,16 +894,15 @@
+         {
+           "id": "read-spec",
+           "title": "读本次要求与现有 Spec",
+-          "summary": "只看受影响内容及直接依赖，先找到这次修改的边界。",
++          "summary": "读取当前来源、派生基线和 Spec 净差异，定位本批受影响段落。",
+           "method": "product-documentation",
+           "reads": [
+-            "本批 PRD 要求与明确的产品决定",
+-            "目标 Spec 章节；有页面时读取相关页面"
++            "当前 PRD、独立架构、Spec 与 spec-changes 结果"
+           ],
+           "writes": [
+             "此步只读取，不改文件"
+           ],
+-          "boundary": "不存在页面也能设计；规划内容与观察到的行为分开。",
++          "boundary": "已有非派生 Spec 沿原编辑流程；没有基线不能覆盖。",
+           "evidence": [
+             "spec-input",
+             "spec-local"
+@@ -923,41 +937,44 @@
+         },
+         {
+           "id": "write-spec",
+-          "title": "融合产品与架构，形成 Spec",
+-          "summary": "先按完整功能写明条件、执行过程、结果与恢复，再组织页面和操作节点。",
++          "title": "按明确来源程序派生 Spec",
++          "summary": "从 PRD 和独立架构取出完整来源；有手改先回源修订，再预览候选。",
+           "method": "product-documentation",
+           "reads": [
+-            "本批产品要求、已有 Spec 与适用工程决定",
+-            "有页面时核对可见行为"
++            "明确来源绑定、当前 PRD 和架构；待同步手改"
+           ],
+           "writes": [
+-            "同一份 Markdown Spec 的功能正文、工程章节及受影响引用"
+-          ],
+-          "boundary": "使用产品文档的 Spec 编写路径；不自动打开工作台，产品定义变化先按 PRD 路径处理，不修改 HTML。",
+-          "evidence": [
+-            "prd-gate",
+-            "spec-readonly",
+-            "spec-check",
++            "候选或已派生 Spec；工具侧版本与差异记录"
++          ],
++          "boundary": "程序不补造业务和技术决定；不改 Map，不把派生成功当作产品确认。",
++          "evidence": [
+             "spec-fusion",
+-            "spec-function"
++            "spec-function",
++            "spec-manual"
++          ],
++          "references": [
++            {
++              "path": "skills/product-documentation/references/spec-derivation.md",
++              "when": "派生、刷新或同步手改时",
++              "purpose": "运行 derive-spec/spec-changes，检查具体来源与候选版本；有冲突保留手改。"
++            }
+           ]
+         },
+         {
+           "id": "check-spec",
+-          "title": "自审与独立复核 Spec",
+-          "summary": "作者核对来源与完整功能；实质内容由只读子 Agent 独立核对，原任务修正后复核受影响范围。",
++          "title": "核对转换与手改承接",
++          "summary": "正常派生由程序校验；手改回流仅复核受影响来源，并核对候选是否承接修改。",
+           "method": "product-documentation",
+           "reads": [
+-            "本批完整功能及适用来源、公共规则与未决项",
+-            "当前 Spec 及必要工程依据"
++            "程序校验结果；受影响来源及派生候选"
+           ],
+           "writes": [
+-            "发现问题时修订受影响正文与引用"
+-          ],
+-          "boundary": "复核通过不代表产品确认、工作台全文承载或运行验收；纯格式修改不自动扩大外审。",
++            "验证结果；必要的逐项同步回执"
++          ],
++          "boundary": "不让 Agent 再重写或评审正常派生全文；旧手写 Spec 保持适用复核。",
+           "evidence": [
+             "spec-check",
+-            "spec-review"
++            "spec-preview"
+           ]
+         },
+         {
+@@ -999,16 +1016,16 @@
+         {
+           "id": "architecture-spec",
+           "related_scenario": "architecture-product",
+-          "title": "为功能设计必要机制",
+-          "summary": "依据产品结果设计或复用状态、数据与交互机制，并落实到 Spec 功能正文。",
++          "title": "设计或复用本批独立架构",
++          "summary": "根据 PRD 和现有工程设计系统、模块、数据与关键机制，供 Spec 明确引用。",
+           "method": "software-architecture-design",
+           "reads": [
+             "本批 Spec、Project 约束和相关实现证据"
+           ],
+           "writes": [
+-            "同一 Spec 的对应功能正文与工程章节；已采用独立入口的 Project 沿用该入口"
+-          ],
+-          "boundary": "记录原因、范围、明确不改、取舍和回归检查；不改写产品规则。",
++            "独立架构中的适用决定与来源 ID"
++          ],
++          "boundary": "已有约束足够则复用；不按页面操作节点拆分架构。",
+           "evidence": [
+             "architecture-spec",
+             "engineering",
+@@ -1093,16 +1110,15 @@
+         {
+           "id": "sync-spec",
+           "title": "再核对 Spec",
+-          "summary": "核对页面、路由、行为、状态、工程约束和验收，只保存必要变化。",
++          "summary": "核对页面变化对来源的影响，先修订相应 PRD／架构并承接 Spec 手改，再重新派生。",
+           "method": "product-documentation",
+           "reads": [
+             "已核对的 PRD、最终页面与当前 Spec"
+           ],
+           "writes": [
+-            "Spec 的必要修订；已有覆盖则说明无需修改，缺失则形成本批草稿",
+-            "非产品 HTML：说明 Spec 不适用，不新建产品文档"
+-          ],
+-          "boundary": "使用 generate，不自动打开工作台；试做、仿真和未决冲突不能变成正式决定。",
++            "来源必要修订及派生 Spec；未解决差异"
++          ],
++          "boundary": "历史 Spec 未迁移仍沿原方法；不自动覆盖手改。",
+           "evidence": [
+             "html-spec",
+             "spec-local",
+@@ -1188,8 +1204,8 @@
+           "id": "architecture-product",
+           "title": "架构如何融入产品",
+           "question": "架构 Skill 内部怎样选择参考并交接？",
+-          "entry": "当前任务在 PRD、Spec 或实现中判断技术影响；由同一任务执行 Skill 方法。",
+-          "boundary": "先判适用性。已有约束足够就复用；需要新设计时才继续下面步骤。独立文件另有同页场景。设计与功能成文可以反复调整。",
++          "entry": "PRD 足以支持系统划分后、Spec 派生和实现前，设计或复用本批架构。",
++          "boundary": "按实际影响判断；设计独立维护，产品变化回 PRD，已有约束足够则复用。",
+           "evidence": [
+             "arch-entry",
+             "architecture-spec"
+@@ -1238,7 +1254,7 @@
+           "id": "architecture-files",
+           "title": "独立架构文件",
+           "question": "哪些场景才使用设计标准、ADR 与 RFC？",
+-          "entry": "用户明确要求独立架构产物，Project 已采用其生命周期，或当前确属没有产品 Spec 的独立架构任务。",
++          "entry": "维护当前独立架构；只有额外需要长期独立决定或多方协商时才使用 ADR／RFC。",
+           "boundary": "按信息选择文件，多个类型可以适用；参考和模板服务于当前产物。仅当前讨论的候选无需创建文件。",
+           "evidence": [
+             "arch-route",
+@@ -1299,9 +1315,9 @@
+         },
+         {
+           "id": "spec-edit",
+-          "title": "修订现有 Spec",
++          "title": "Spec 派生与手改同步",
+           "question": "只是改文档，哪些步骤需要走？",
+-          "entry": "已有 Spec，本次只要求修订文档；没有授权页面开发。",
++          "entry": "已有明确来源的 Spec；手改保存后按需回流。本次文档任务不授权页面开发。",
+           "boundary": "不用重跑全产品流程，不开发页面，不自动启动工作台。",
+           "evidence": [
+             "spec-local",
+@@ -1316,7 +1332,7 @@
+             {
+               "id": "write",
+               "action": "write-spec",
+-              "next": "本批正文修订后"
++              "next": "已得到候选并处理受影响来源后"
+             },
+             {
+               "id": "check",
+@@ -1347,7 +1363,7 @@
+               "condition": "本次涉及新的模块、数据、接口等工程边界",
+               "action": "architecture-spec",
+               "return_to": "write",
+-              "return_label": "工程决定补入 Spec 后，继续本批修订",
++              "return_label": "独立架构已更新，再核对派生候选",
+               "evidence": [
+                 "architecture-spec",
+                 "architecture-skip"
+@@ -1375,6 +1391,11 @@
+               "id": "review",
+               "action": "review-prd",
+               "next": "评审结束，或用户已明确联合草稿、直接生成 Spec 或暂缓评审后"
++            },
++            {
++              "id": "architecture",
++              "action": "architecture-spec",
++              "next": "本批必要架构已明确或已有设计足够后"
+             },
+             {
+               "id": "spec",
+@@ -1406,18 +1427,6 @@
+               "return_label": "技术判断反馈产品定义，再继续 PRD",
+               "evidence": [
+                 "architecture-product"
+-              ]
+-            },
+-            {
+-              "id": "engineering-decision",
+-              "at": "spec",
+-              "condition": "本批功能需要状态、数据、接口等工程机制",
+-              "action": "architecture-spec",
+-              "return_to": "spec",
+-              "return_label": "将必要机制融入功能定义，再继续 Spec",
+-              "evidence": [
+-                "architecture-spec",
+-                "implementation-gate"
+               ]
+             },
+             {
+@@ -1502,7 +1511,7 @@
+       "kind": "relation",
+       "layout": "architecture",
+       "decision_question": "当前产品定义或实现是否需要新的结构、数据或上线决定？",
+-      "description": "根 Agent 从 PRD 讨论和 Spec 细化阶段按影响判断；已有约束足够就复用，需要时整体检查领域、结构、运行、状态数据、质量和上线。本批必要工程决定在实现前写入同一 Spec。",
++      "description": "根 Agent 在 PRD 足以支撑系统设计后判断实际影响；已有架构足够就复用，需要时独立设计。本批必要决定在 Spec 派生和实现前明确。",
+       "parent": "stage-method",
+       "sources": [
+         "~/.codex/AGENTS.md",
+@@ -1537,12 +1546,12 @@
+         },
+         {
+           "title": "在正确落点保存技术决定",
+-          "description": "细化 Spec 时按产品工程参考写入必要决定；已有充分约束直接复用。只有明确采用独立架构产物时才读取其路径和模板，Spec 与独立文件不各存一套决定。",
+-          "stage_label": "与 Spec 一起 · 主要实现前"
++          "description": "读取 PRD 后在独立架构维护必要机制；已有充分约束直接复用，Spec 只按明确来源派生。",
++          "stage_label": "PRD 之后 · Spec 派生前"
+         },
+         {
+           "title": "固定本次可执行约束",
+-          "description": "在同一 Spec 中明确页面路由、代码模块、复用组件、状态数据、源码构建，以及 HTML 的交付形态、打开方式和验证要求；完整开发再展开接口、事务、权限、部署与恢复。已有架构决定引用正式入口，避免重复维护。",
++          "description": "在独立架构中按实际影响明确模块、组件、状态数据、接口、恢复与运行边界；产品行为由 PRD 定义，Spec 引用完整来源。",
+           "stage_label": "主要实现前"
+         },
+         {
+@@ -1557,7 +1566,7 @@
+         },
+         {
+           "title": "按产物生命周期写回 Project",
+-          "description": "技术方案与实现状态默认回同一 Spec 工程章节，实际行为回源码与测试；已有架构契约按验证结果同步。只在明确独立架构任务中采用独立路径，Progress 不承载架构事实。",
++          "description": "技术方案回独立架构，产品行为回 PRD，实际实现回源码与测试；同步受影响 Spec，Progress 不承载架构事实。",
+           "stage_label": "第 8 阶段"
+         }
+       ],
+@@ -1697,15 +1706,15 @@
+       ],
+       "items": [
+         {
+-          "title": "Spec 中的工程约束",
+-          "description": "由根 Agent 自动判断并整体取舍，按 HTML 产品或完整开发写入同一 Spec。独立 Architecture Design、ADR、RFC 仅在用户要求或既有 Project 明确采用时沿用。",
++          "title": "独立架构与派生 Spec",
++          "description": "由当前任务按 PRD 和实际工程边界设计独立架构；普通任务不强制八章、ADR 或 RFC，Spec 为明确来源的派生视图。",
+           "target": "#/skill/software-architecture-design",
+           "relation": "produces",
+           "requirement": "判定为需要技术架构设计时"
+         },
+         {
+           "title": "PRD 与统一 Spec",
+-          "description": "PRD 定义整体产品，同一 Spec 承接页面行为、共享约束、工程与验收。每轮 HTML 达到可交付状态后，当前任务依次核对 PRD 与 Spec、保存必要修订，无需文档选择；已有覆盖说明无需修改。保留稳定 ID、候选状态和人工映射。",
++          "description": "PRD 定义产品，独立架构定义技术，Spec 按明确来源派生并接受手改反馈。页面交付仍核对 PRD 与 Spec；保留稳定 ID、原确认程度和人工映射。",
+           "target": "#/skill/product-documentation",
+           "relation": "produces",
+           "requirement": "文档请求或每轮 HTML 交付；单独文档请求不擅自开发页面"
+@@ -1781,7 +1790,7 @@
+       "items": [
+         {
+           "title": "技术架构与架构变化",
+-          "description": "检查 Spec 工程约束是否覆盖实际模块、路由、数据、质量与交付边界，再运行当前 Project 统一验证。独立 Architecture Design、ADR、RFC 才使用对应结构验证器；结构通过不证明技术决定正确。",
++          "description": "检查独立架构是否解释适用模块、数据、质量与交付机制，再运行当前 Project 验证。模板校验只用于对应格式；Spec 正常派生不重审全文。",
+           "target": "#/view/architecture-change-flow",
+           "preserve_origin": true,
+           "relation": "validatedBy",
+@@ -1924,14 +1933,14 @@
+         },
+         {
+           "title": "技术设计、长期决定或当前架构变了",
+-          "description": "默认写入同一 Spec 工程章节，区分候选、采用和已实现；源码与测试保存实际行为。明确采用独立设计、ADR、RFC 或架构契约的 Project 沿其入口维护，Progress 只记录活动状态。",
++          "description": "技术设计写入独立架构，区分候选、采用与已实现；实际行为回源码和测试，Spec 按来源刷新，Progress 只记录活动状态。",
+           "target": "#/skill/software-architecture-design",
+           "relation": "writesBackTo",
+           "requirement": "技术约束需要保留时"
+         },
+         {
+           "title": "正式产品定义或实施约束变了",
+-          "description": "目标范围、主链、对象权威来源和模块责任回 PRD；页面行为、共享细则、工程与验收回同一 Spec。每轮 HTML 交付必须核对两份文档、保存必要修订后报告完成，冲突或失败如实保留未完成项；下一轮从当前文件恢复。历史制品仍按授权迁移。",
++          "description": "产品定义回 PRD，技术机制回独立架构，Spec 手改先记录差异并回源修订，再核对候选并派生。HTML 交付仍核对 PRD 与 Spec；冲突保留，历史制品仅按授权迁移。",
+           "target": "#/view/product-delivery-lifecycle",
+           "relation": "writesBackTo",
+           "requirement": "正式定义变化或每轮 HTML 交付时"

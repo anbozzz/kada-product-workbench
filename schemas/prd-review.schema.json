@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-product-spec.dev/schema/prd-review-2.json",
+  "title": "PrdReviewState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sessionId", "token", "version", "status", "revision", "draftRevision", "annotations", "batches", "previousSource", "agentConnected"],
+  "properties": {
+    "sessionId": { "type": "string", "minLength": 1 },
+    "token": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 0 },
+    "status": { "enum": ["reviewing", "confirmation_requested", "confirmed", "ended"] },
+    "revision": { "type": "string", "minLength": 1 },
+    "draftRevision": { "type": "string", "minLength": 1 },
+    "agentConnected": { "type": "boolean" },
+    "previousSource": { "type": ["string", "null"] },
+    "confirmationRequestedAt": { "type": "string" },
+    "confirmationRevision": { "type": "string", "minLength": 1 },
+    "confirmedAt": { "type": "string" },
+    "confirmedPath": { "type": "string", "minLength": 1 },
+    "confirmationSummary": { "type": "string", "maxLength": 4000 },
+    "annotations": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/annotation" } },
+    "batches": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "baseRevision", "annotations", "status", "submittedAt"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "baseRevision": { "type": "string", "minLength": 1 },
+          "revision": { "type": "string" },
+          "status": { "enum": ["queued", "processing", "needs_review", "withdrawn", "stop_requested", "stopped", "published"] },
+          "submittedAt": { "type": "string" },
+          "startedAt": { "type": "string" },
+          "withdrawnAt": { "type": "string" },
+          "stopRequestedAt": { "type": "string" },
+          "stoppedAt": { "type": "string" },
+          "publishedAt": { "type": "string" },
+          "summary": { "type": "string", "maxLength": 4000 },
+          "annotations": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "$ref": "#/$defs/annotation" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "annotation": {
+      "title": "PrdReviewAnnotation",
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "comment", "anchor"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "kind": { "enum": ["comment", "replace", "delete", "general"] },
+        "comment": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "anchor": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object", "additionalProperties": false,
+              "required": ["quote", "startLine", "endLine"],
+              "properties": {
+                "quote": { "type": "string", "minLength": 1, "maxLength": 8000 },
+                "startLine": { "type": "integer", "minimum": 1 },
+                "endLine": { "type": "integer", "minimum": 1 },
+                "quoteOccurrence": { "type": "integer", "minimum": 0 },
+                "sectionId": { "type": ["string", "null"] },
+                "context": { "type": "string" }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

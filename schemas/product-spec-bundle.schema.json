@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interactive-product-spec.dev/schema/product-spec-bundle-0.1.json",
+  "title": "ProductSpecBundle",
+  "type": "object",
+  "required": ["schemaVersion", "product", "modules"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "0.1" },
+    "product": {
+      "type": "object",
+      "required": ["id", "title", "version", "status"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["draft", "reviewing", "confirmed", "superseded"] },
+        "description": { "type": "string" },
+        "sourceRefs": { "type": "array", "items": { "type": "string" } },
+        "prdSource": {
+          "title": "PrdSourceReference",
+          "type": "object",
+          "required": ["path", "version", "revision"],
+          "additionalProperties": false,
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "version": { "type": "string", "minLength": 1 },
+            "revision": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "pages": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/page" }
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/module" }
+    }
+  },
+  "$defs": {
+    "module": {
+      "title": "SpecModule",
+      "type": "object",
+      "required": ["id", "title", "purpose", "nodes"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$" },
+        "title": { "type": "string", "minLength": 1 },
+        "purpose": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string" },
+        "journeys": { "type": "array", "items": { "type": "string" } },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/page" }
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/node" }
+        }
+      }
+    },
+    "page": {
+      "title": "SpecPage",
+      "type": "object",
+      "required": ["id", "title", "anchorHints"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$" },
+        "title": { "type": "string", "minLength": 1 },
+        "responsibility": { "type": "string", "minLength": 1 },
+        "parentPageId": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$" },
+            { "type": "null" }
+          ]
+        },
+        "routeHints": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "anchorHints": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "node": {
+      "title": "SpecNode",
+      "type": "object",
+      "required": ["id", "type", "title", "status", "sourceKind", "anchorHints"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$" },
+        "type": { "enum": ["SURFACE", "ACTION", "RULE", "STATE", "EVENT", "PERMISSION", "EXTERNAL", "AC", "TBD"] },
+        "title": { "type": "string", "minLength": 1 },
+        "pageId": {
+          "anyOf": [
+            { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9._-]*$" },
+            { "type": "null" }
+          ]
+        },
+        "status": { "enum": ["draft", "reviewing", "confirmed", "superseded"] },
+        "sourceKind": { "enum": ["observed-ui", "product-decision", "candidate", "formal-source", "simulation", "tbd"] },
+        "surface": { "type": "string" },
+        "statement": { "type": "string" },
+        "anchorHints": { "type": "array", "items": { "type": "string" } },
+        "prdSectionIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(需求|规则)-[^\\s]+(?:-[^\\s]+)*$"
+          }
+        },
+        "contentBlocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/contentBlock" }
+        },
+        "fields": {
+          "type": "object",
+          "deprecated": true,
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "targetId"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "type": "string", "minLength": 1 },
+              "targetId": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      },
+      "not": { "required": ["contentBlocks", "fields"] }
+    },
+    "contentBlock": {
+      "title": "SpecContentBlock",
+      "type": "object",
+      "required": ["id", "label", "content"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "label": { "type": "string", "minLength": 1 },
+        "content": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
