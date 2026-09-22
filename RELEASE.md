@@ -1,6 +1,15 @@
 # 安装包发布
 
-本文件供维护者使用；用户与安装 Agent 从 [INSTALL.md](INSTALL.md) 开始。当前没有公开仓库地址，不代表已经公开发布或可从 npm 安装。
+本文件供维护者使用；用户与安装 Agent 从 [INSTALL.md](INSTALL.md) 开始。官方仓库为 [anbozzz/kada-product-workbench](https://github.com/anbozzz/kada-product-workbench)，归档与 SHA256SUMS 一起发布到 GitHub Releases；未发布到 npm。
+
+## 0.12.7 发布闭环修复
+
+- 修复宽度小于 1280px 时绑定模式、评审模式缺少可访问名称的问题；保留图标、模式切换及原画布，增加窄屏键盘切换回归。
+- 源码根目录直接跟踪官方仓库 main。README 为产品首页，DEVELOPMENT 为工程说明；保留远端作者修改。旧本地历史保存在本机 safety/local-before-github-sync，不对外推送该备份分支。
+- `.github/workflows/verify.yml` 对 main 推送和 PR 执行统一验证与安装包构建，失败保留浏览器诊断。
+- 普通推送只验证。明确发布时，先提升 package.json/package-lock.json 版本，使用以 `release:` 开头的提交消息推送 main，或在 main 手动运行工作流并选择 release；验证成功后才生成该版本 Tag、Release、安装归档和 SHA256SUMS。已有 Release 拒绝覆盖。
+- 日常更新先 fetch 并核对远端作者修改，再在当前开发目录提交和推送；不再使用 output 下的副本作为开发或发布源，不覆盖旧版本附件。
+- Windows/Linux 创作端、第二台设备及新任务中的 Hook 信任仍需对应实机验收。
 
 ## 0.12.6 共享 Skill 随包交付（候选）
 

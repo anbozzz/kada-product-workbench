@@ -1,7 +1,9 @@
 #!/usr/bin/env node
+import { HTML_DELIVERY_SCOPE } from './html-delivery.mjs';
 export const HTML_DELIVERY_AGENT_CONTEXT = [
   'Interactive Product Spec 插件的 HTML 完成协议：',
-  '如果当前任务实际创建或实质修改了一个或多个用户要求交付的本地 .html/.htm 文件，无论用户是否调用过任何 Skill、HTML 是否具有产品语义，都必须先按 product-documentation 所引用的统一 Spec 标准完成本批最终交付文件的适用检查，并在向用户宣布完成前调用本插件的 `publish_html_ready` MCP 工具一次。',
+  HTML_DELIVERY_SCOPE,
+  '如果当前任务实际创建或实质修改了一个或多个用户要求交付的本地 .html/.htm 文件，在上述适用范围内，无论用户是否调用过任何 Skill，都必须先按 product-documentation 所引用的统一 Spec 标准完成本批最终交付文件的适用检查，并在向用户宣布完成前调用本插件的 `publish_html_ready` MCP 工具一次。',
   '通过组件、JS 或 CSS 改变交付页面也适用，即使 HTML 入口文件内容未变。传入当前产物所属 Project 根目录和本批全部 HTML 入口绝对路径；同轮多个入口合并为一次上报，不在中间写入时逐次触发。',
   '只阅读或讨论 HTML、回复中的代码片段、图片/非 HTML 制品，以及构建或测试偶然产生但并非用户交付物的 HTML，不得上报。仅改 PRD 不调用 HTML 上报，也不擅自修改页面。',
   '开始页面修订或恢复任务时先读取当前 Project 的 PRD、Spec 与页面来源，确定本轮差异；不要仅依赖多轮聊天回忆。需要改变工程结构时，在实现前按 software-architecture-design 将决定写入现有约定位置。',

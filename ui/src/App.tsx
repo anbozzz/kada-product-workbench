@@ -1480,13 +1480,15 @@ function App() {
                 <TabsList aria-label="工作模式" className="h-8 rounded-xl bg-muted/55 p-0.5">
                   <TabsTrigger
                     value="map"
+                    aria-label="绑定模式"
+                    title="绑定模式"
                     disabled={!config.canSave}
                     className="rounded-lg px-2.5 text-[11px]"
                   >
                     <Link2 className="size-3.5" />
                     <span className="hidden xl:inline">绑定模式</span>
                   </TabsTrigger>
-                  <TabsTrigger value="review" className="rounded-lg px-2.5 text-[11px]">
+                  <TabsTrigger value="review" aria-label="评审模式" title="评审模式" className="rounded-lg px-2.5 text-[11px]">
                     <FileCheck2 className="size-3.5" />
                     <span className="hidden xl:inline">评审模式</span>
                   </TabsTrigger>

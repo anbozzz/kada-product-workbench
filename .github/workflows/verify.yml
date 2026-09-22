@@ -1,0 +1,82 @@
+name: Verify and release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: '验证通过后发布 package.json 中的新版本'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            ui/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix ui
+      - run: npx --no-install playwright-core install --with-deps chromium
+      - run: npm run verify
+      - name: Build portable installer
+        run: npm run package:release -- --output output/releases/verified
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-installer
+          path: |
+            output/releases/verified/*.tar.gz
+            output/releases/verified/SHA256SUMS
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-diagnostics
+          path: output/playwright/
+          if-no-files-found: ignore
+
+  release:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.release) || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'release:')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-installer
+          path: installer
+      - name: Publish immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=$(node -p 'JSON.parse(require("fs").readFileSync("package.json", "utf8")).version')
+          cd installer
+          sha256sum --check SHA256SUMS
+          if gh release view "v${version}" >/dev/null 2>&1; then
+            echo "Release v${version} already exists; refusing to overwrite assets."
+            exit 1
+          fi
+          gh release create "v${version}" "interactive-product-spec-${version}.tar.gz" SHA256SUMS \
+            --target "$GITHUB_SHA" --title "咔哒 ${version}" \
+            --notes "通过构建、Node 测试与真实浏览器旅程后生成的安装包。请同时下载归档与 SHA256SUMS，并按照仓库 INSTALL.md 安装。Windows/Linux 创作端实机验收及客户新任务中的 Hook 信任需单独完成。"

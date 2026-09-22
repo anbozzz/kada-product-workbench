@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "source": "维护者显式提供的共享 Skill；相对路径从 skills 根开始，内容由 SHA-256 固定。",
   "files": {
-    "product-documentation/SKILL.md": "3b3ed02cd79e4e510f2f7c93058a409bdb296b69669b7ef048e556fcbf439a0b",
+    "product-documentation/SKILL.md": "c8c5a0d1694cbfbe6163e27b798654538172e8568d8a5b306a28d84abdc7c205",
     "product-documentation/agents/openai.yaml": "1c6a197a3d344507002bb4f59c3aafba7b79300761bde6c77ae711bf69f9f4c8",
     "product-documentation/agents/prd-reviewer.md": "7b69f45fb2556e4c2878a5fe8867b9445f3bde778382ecab28a5387e76d42a38",
     "product-documentation/agents/spec-reviewer.md": "e2c3368a62315b7e5e7e6b1e60386155e47267630e3194ec749fab07789dc2ad",

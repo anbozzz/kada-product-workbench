@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { HTML_DELIVERY_SCOPE } from '../src/html-delivery.mjs';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
@@ -30,6 +31,7 @@ test('SessionStart 只注入 HTML 完成协议，不扫描目录或弹出确认'
   const output = JSON.parse(result.stdout);
   const context = output.hookSpecificOutput.additionalContext;
   assert.equal(output.hookSpecificOutput.hookEventName, 'SessionStart');
+  assert.equal(context.split('\n')[1], HTML_DELIVERY_SCOPE);
   assert.match(context, /无论用户是否调用过任何 Skill/);
   assert.match(context, /publish_html_ready/);
   assert.match(context, /\$product-documentation/);

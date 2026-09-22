@@ -3,6 +3,8 @@ import { readFile, realpath, stat } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { extname, isAbsolute, parse, relative, resolve, sep } from 'node:path';
 
+export const HTML_DELIVERY_SCOPE = '本协议仅适用于用户明确要求编写或同步产品文档，或本轮依据当前 Project 的 PRD/Spec 实施产品功能的 HTML 交付。仅从真实源码抽取页面、隔离运行预览及未纳入产品文档流程的功能试做，不调用 publish_html_ready 或产品文档 Skill，不自动创建 PRD/Spec；后续明确纳入产品文档流程时再适用。判断依据是本轮任务目标，不是页面有业务内容或目录中碰巧存在文档。以下 HTML 同步要求均限于此适用范围。';
+
 const MAX_HTML_FILES = 20;
 const MAX_HTML_BYTES = 10 * 1024 * 1024;
 const sha256 = value => createHash('sha256').update(value).digest('hex');
@@ -106,6 +108,7 @@ export async function resolveHtmlDeliveryBatch(input) {
 
 
 const DOCUMENT_SYNC_INSTRUCTION = [
+  HTML_DELIVERY_SCOPE,
   '本批 HTML 已通过路径与 revision 校验，PRD 与统一 Spec 尚待当前 Agent 核对；工具返回不表示文档已同步。',
   '现在显式使用 `$product-documentation`，先核对 PRD 再核对 Spec，在同一任务执行 product-documentation 的“HTML 交付与文档同步”方法，不询问文档选择或 PRD 类型。',
   '按本轮用户明确反馈、当前 Project 正式文档和实际页面差异处理，先核对 PRD 的需求与规则，再核对统一 Spec 的页面行为、工程约束和验收；只修订受影响内容，已有覆盖则说明无需修改。',

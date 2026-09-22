@@ -12,7 +12,7 @@
 
 - 若本文件旁已有 `install.mjs`、`release.json`、`plugins/` 和 `.agents/`，这是解压后的发布包，直接进入环境检查。
 - 若正在阅读源码仓库或远程说明，从**同一个、用户确认的仓库**取得维护者发布的 `interactive-product-spec-版本.tar.gz` 和 `SHA256SUMS`。不要把 GitHub 的 Source code 下载当成安装包，不要执行其他搜索结果里的同名包，也不默认执行 `npx interactive-product-spec`。
-- 官方仓库：[anbozzz/kada-product-workbench](https://github.com/anbozzz/kada-product-workbench)，发布包入口：[Releases](https://github.com/anbozzz/kada-product-workbench/releases)。若暂无发布附件，停止下载步骤，不把源码压缩包当成安装包。
+- 官方仓库：[anbozzz/kada-product-workbench](https://github.com/anbozzz/kada-product-workbench)，安装包入口：[Releases](https://github.com/anbozzz/kada-product-workbench/releases)。取得同一版本的归档和 SHA256SUMS；若暂无附件，停止下载，不把源码压缩包当作安装包。
 - 下载到临时目录；先用系统 SHA-256 工具校验归档与 `SHA256SUMS` 一致，再检查归档条目不含绝对路径、`..`、符号链接和特殊文件，解压到新的空目录。校验文件必须来自同一可信发布；哈希一致不等于身份可信。
 - 默认把解压包保存在当前 Codex 用户目录的 `plugin-sources/interactive-product-spec/版本/`，不要要求用户先挑目录；该目录从当前 Codex 环境解析，不能照搬开发者路径。若用户指定 Workspace 内的目录，使用其指定的空目录。最终安装副本仍由 Codex 管理，来源目录保留供重装和检查，不要安装后立即删除。
 

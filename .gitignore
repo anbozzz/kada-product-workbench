@@ -10,3 +10,11 @@ output/playwright/
 
 # Generated installation artifacts; publish archives separately from source Git.
 /output/releases/
+
+# Local development records are not public release inputs.
+/output/
+/.playwright-cli/
+/progress/
+/_project-memory.md
+/AGENTS.md
+/打开工作台.command

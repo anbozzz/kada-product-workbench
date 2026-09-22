@@ -116,7 +116,7 @@
 
 > 请按照这份说明安装咔哒工作台，检查环境和已有安装，并验证安装结果。
 
-Codex 按说明从同一仓库的 Releases 取得发布包和校验文件，完成校验、解压、预检与安装。GitHub 自动生成的 Source code 压缩包是源码，不是预构建安装包。当前尚未公开发布，可先使用维护者提供的候选包。
+Codex 按说明从同一仓库的 [Releases](https://github.com/anbozzz/kada-product-workbench/releases) 取得发布包和校验文件，完成校验、解压、预检与安装。请同时下载 `interactive-product-spec-版本.tar.gz` 和 `SHA256SUMS`；GitHub 自动生成的 Source code 压缩包是源码，不是预构建安装包。
 
 安装完成后，按宿主提示确认启动脚本信任，并在新任务中检查插件是否已加载。详细操作与失败恢复统一见 [安装说明](INSTALL.md)。
 
@@ -197,10 +197,9 @@ PRD 首次生成并通过校验后，如果你没有安排下一步，Codex 会�
 ## 当前可用范围与发布说明
 
 - 当前以 Codex 为使用入口；没有承诺其他 Agent 可以直接加载全部能力。
-- 0.12.6 候选包已完成 macOS 隔离安装验证，项目统一验证包含 204 项 Node 测试和真实浏览器回归。
+- 当前源码版本为 0.12.7；每次发布须通过构建、Node 测试和真实浏览器回归，安装包与校验文件一起提供。
 - Windows、Linux 的创作插件安装与运行尚未完成实机验收；局域网分享的跨设备使用也仍需验证，不能用本机测试代替。
 - 本地优先不等于 AI 全程离线。模型调用需要相应服务；新 HTML 工程首次安装依赖通常需要网络或已有缓存。
 - 源码仓库：[anbozzz/kada-product-workbench](https://github.com/anbozzz/kada-product-workbench)。安装包请查看 [Releases](https://github.com/anbozzz/kada-product-workbench/releases)；若尚无发布附件，请勿将 Source code 当作安装包。
 
-安装步骤见 [INSTALL.md](INSTALL.md)，维护者的打包和发布流程见 [RELEASE.md](RELEASE.md)，更完整的现有能力说明见 [README.md](DEVELOPMENT.md)。
-
+安装步骤见 [INSTALL.md](INSTALL.md)，维护者的打包和发布流程见 [RELEASE.md](RELEASE.md)，更完整的现有能力说明见 [DEVELOPMENT.md](DEVELOPMENT.md)。

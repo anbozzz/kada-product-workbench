@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import readline from 'node:readline';
 import { readFileSync } from 'node:fs';
-import { PRD_FOLLOWUP_SCHEMA, publishHtmlReady } from './html-delivery.mjs';
+import { HTML_DELIVERY_SCOPE, PRD_FOLLOWUP_SCHEMA, publishHtmlReady } from './html-delivery.mjs';
 import { createPrdReviewMcp, prdReviewTools } from './prd-review-mcp.mjs';
 
 const serverInfo = { name: 'interactive-product-spec-html-delivery', version: JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version };
@@ -24,7 +24,7 @@ const send = message => process.stdout.write(`${JSON.stringify(message)}\n`);
 const tools = [{
   name: 'publish_html_ready',
   title: '上报 HTML 并接续文档同步',
-  description: '当前 Codex 任务创建或实质修改用户要求交付的本地 HTML 页面、完成最低验证后调用一次；组件、JS 或 CSS 改变页面但 HTML 入口未变时，也上报该入口。无论用户是否调用 Skill，都在同一任务接续 PRD 与统一 Spec 核对，按影响修订后才完成交付，不弹出文档或类型选择。工具只校验指定 HTML，不读写文档、不证明已同步。按返回指令依次使用两项 Skill，判断修订、无需修改或非产品 HTML 不适用。只读、聊天代码、仅 PRD 修订、构建测试偶然产物不上报。旧 prdFollowup 仅兼容，不免除同步。',
+  description: HTML_DELIVERY_SCOPE + '\n' + '当前 Codex 任务创建或实质修改用户要求交付的本地 HTML 页面、完成最低验证后调用一次；组件、JS 或 CSS 改变页面但 HTML 入口未变时，也上报该入口。无论用户是否调用 Skill，都在同一任务接续 PRD 与统一 Spec 核对，按影响修订后才完成交付，不弹出文档或类型选择。工具只校验指定 HTML，不读写文档、不证明已同步。按返回指令使用产品文档 Skill，判断修订、无需修改或非产品 HTML 不适用。只读、聊天代码、仅 PRD 修订、构建测试偶然产物不上报。旧 prdFollowup 仅兼容，不免除同步。',
   inputSchema: {
     type: 'object',
     properties: {
@@ -74,7 +74,7 @@ const handleRequest = async message => {
         protocolVersion: params.protocolVersion,
         capabilities: { tools: { listChanged: false } },
         serverInfo,
-        instructions: '用户要求的本地 HTML 完成最低验证后调用 publish_html_ready 一次，再在当前任务使用 product-documentation 先核对 PRD 再核对 Spec，完成本轮同步。工具返回 document-sync-required 仅表示待处理；两个文档均核对并完成必要修订后才能宣布交付完成。不询问文档选择，不以历史决定或 prdFollowup 跳过。仅 PRD 修订不上报。PRD 首次生成完成且仍为草稿或评审中、用户未安排下一步时，调用 request_prd_review 询问评审时机。明确开始才 open_prd_review；明确暂缓或直接生成 Spec 则遵从，不重复询问。deferred 保留原任务中的文档链接和继续入口；choice-required 在原任务询问并等待。已有批注会话修订不重复询问；使用默认长等待接收批注、发布修订或处理停止；pending、超时或工具不可用时结束本轮等待，不自动轮询或用终端替代。用户选择确认当前版本后，仍由原任务使用 product-documentation 完成正式确认，再调用 complete_prd_confirmation；结束评审、评审会话状态与反馈批次状态都不得替代正式文档状态。',
+        instructions: HTML_DELIVERY_SCOPE + '\n' + '用户要求的本地 HTML 完成最低验证后调用 publish_html_ready 一次，再在当前任务使用 product-documentation 先核对 PRD 再核对 Spec，完成本轮同步。工具返回 document-sync-required 仅表示待处理；两个文档均核对并完成必要修订后才能宣布交付完成。不询问文档选择，不以历史决定或 prdFollowup 跳过。仅 PRD 修订不上报。PRD 首次生成完成且仍为草稿或评审中、用户未安排下一步时，调用 request_prd_review 询问评审时机。明确开始才 open_prd_review；明确暂缓或直接生成 Spec 则遵从，不重复询问。deferred 保留原任务中的文档链接和继续入口；choice-required 在原任务询问并等待。已有批注会话修订不重复询问；使用默认长等待接收批注、发布修订或处理停止；pending、超时或工具不可用时结束本轮等待，不自动轮询或用终端替代。用户选择确认当前版本后，仍由原任务使用 product-documentation 完成正式确认，再调用 complete_prd_confirmation；结束评审、评审会话状态与反馈批次状态都不得替代正式文档状态。',
       },
     });
     return;

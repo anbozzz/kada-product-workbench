@@ -61,6 +61,20 @@ try {
 
   const viewport = page.getByTestId('canvas-viewport');
   await viewport.waitFor();
+  // Text labels collapse below xl; accessible names and keyboard switching must survive.
+  await page.setViewportSize({ width: 1200, height: 825 });
+  const compactMapTab = page.getByRole('tab', { name: '绑定模式', exact: true });
+  const compactReviewTab = page.getByRole('tab', { name: '评审模式', exact: true });
+  await compactMapTab.waitFor({ state: 'visible' });
+  await compactReviewTab.waitFor({ state: 'visible' });
+  const originalFrame = await page.locator('iframe').elementHandle();
+  await compactMapTab.focus();
+  await page.keyboard.press('ArrowRight');
+  await page.waitForFunction(() => document.querySelector('[role="tab"][aria-label="评审模式"]')?.getAttribute('aria-selected') === 'true');
+  await page.keyboard.press('ArrowLeft');
+  await page.waitForFunction(() => document.querySelector('[role="tab"][aria-label="绑定模式"]')?.getAttribute('aria-selected') === 'true');
+  assert.equal(await originalFrame.evaluate(frame => frame.isConnected), true, '窄屏键盘切换模式保留原画布');
+  await page.setViewportSize({ width: 1626, height: 870 });
   await assert.doesNotReject(async () => {
     await page.getByTestId('map-save-status').getAttribute('aria-label');
   });
