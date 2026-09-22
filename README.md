@@ -90,47 +90,6 @@
 
 ![咔哒功能流程图：产品定义、页面实现、评审交付与修改回路](drafts-documents/assets/kada-workflow.png)
 
-<details>
-<summary>查看与编辑流程图源码</summary>
-
-```mermaid
-%%{init: {"theme": "base", "fontFamily": "Inter, PingFang SC, Microsoft YaHei, sans-serif", "themeVariables": {"background": "#0B1018", "primaryColor": "#16232A", "primaryTextColor": "#E7EDF2", "primaryBorderColor": "#35534C", "lineColor": "#58E0AA", "secondaryColor": "#131B25", "tertiaryColor": "#101720", "clusterBkg": "#101720", "clusterBorder": "#2B3947", "titleColor": "#E7EDF2", "edgeLabelBackground": "#101720", "fontFamily": "Inter, PingFang SC, Microsoft YaHei, sans-serif", "fontSize": "16px"}, "flowchart": {"htmlLabels": false, "curve": "rounded", "nodeSpacing": 32, "rankSpacing": 46, "padding": 20, "wrappingWidth": 520}}}%%
-flowchart TB
-    subgraph DEFINE["01 · 产品定义　把问题与规则说清楚"]
-        direction LR
-        A("澄清想法与取舍") --> B("编写 PRD") --> C("阅读与批注评审")
-        C -. 修改产品定义 .-> B
-    end
-
-    subgraph BUILD["02 · 页面实现　让设计有依据、结果可验证"]
-        direction LR
-        D("设计或复用必要架构") --> E("按明确来源派生 Spec")
-        E --> F("实现并验证 HTML") --> G("核对文档与页面变化")
-    end
-
-    subgraph REVIEW["03 · 评审交付　在页面中理解需求"]
-        direction LR
-        H("按需关联页面与 Spec") --> I("在页面中阅读和评审")
-        I --> J("导出只读包<br/>或局域网分享")
-    end
-
-    DEFINE --> BUILD --> REVIEW
-    REVIEW -. 发现需要修改的内容 .-> RETURN
-    RETURN["修改回路<br/>产品意见 → PRD　｜　技术意见 → 架构<br/>更新来源 → 重新派生 → 核对页面"]
-
-    classDef step fill:#16232A,stroke:#35534C,color:#E7EDF2,stroke-width:1px;
-    classDef key fill:#183C31,stroke:#58E0AA,color:#B9F5D9,stroke-width:2px;
-    classDef feedback fill:#131B25,stroke:#708497,color:#C2CFDB,stroke-width:1px,stroke-dasharray:5 4;
-    class A,C,D,F,H,I step;
-    class B,E,G,J key;
-    class RETURN feedback;
-    style DEFINE fill:#101720,stroke:#2B3947,color:#9BAFBD
-    style BUILD fill:#101720,stroke:#2B3947,color:#9BAFBD
-    style REVIEW fill:#101720,stroke:#2B3947,color:#9BAFBD
-```
-
-</details>
-
 图中绿色实线表示主要推进顺序，虚线表示意见回流；绿色描边强调文档、核对结果与交付物。可以从已有资料所在的阶段开始，不必每次重新走完整条流程。
 
 | 能力 | 可以完成什么 | 从哪里使用 |
