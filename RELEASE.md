@@ -5,6 +5,7 @@
 ## 0.12.7 发布闭环修复
 
 - 修复宽度小于 1280px 时绑定模式、评审模式缺少可访问名称的问题；保留图标、模式切换及原画布，增加窄屏键盘切换回归。
+- 发布请求 15 秒无响应后保留原操作编号并恢复核实入口；状态读取与核实请求限制为 10 秒，避免网络悬挂永久禁用操作。浏览器回归模拟服务端已完成但响应不返回，验证核实后恢复且无重复发布。
 - 源码根目录直接跟踪官方仓库 main。README 为产品首页，DEVELOPMENT 为工程说明；保留远端作者修改。旧本地历史保存在本机 safety/local-before-github-sync，不对外推送该备份分支。
 - `.github/workflows/verify.yml` 对 main 推送和 PR 执行统一验证与安装包构建，失败保留浏览器诊断。
 - 普通推送只验证。明确发布时，先提升 package.json/package-lock.json 版本，使用以 `release:` 开头的提交消息推送 main，或在 main 手动运行工作流并选择 release；验证成功后才生成该版本 Tag、Release、安装归档和 SHA256SUMS。已有 Release 拒绝覆盖。

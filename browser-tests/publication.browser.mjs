@@ -27,7 +27,12 @@ try {
     await page.getByTestId('open-review-export').click();
     await page.getByTestId('project-publication').waitFor();
     await page.getByLabel('四位访问密码', { exact: true }).fill(password);
-    if (fixture === a) await page.route('**/api/publications/commands', async route => { await route.fetch(); await route.abort('failed'); }, { times: 1 });
+    // Commit upstream but leave the response hanging: the UI must time out,
+    // retain the operation identity, and recover without a duplicate publish.
+    if (fixture === a) await page.route('**/api/publications/commands', async route => {
+      const response = await route.fetch();
+      assert.equal(response.status(), 200, await response.text());
+    }, { times: 1 });
     await page.getByRole('button', { name: /^(开启服务并发布|发布到本机)$/ }).click();
     if (fixture === a) { await page.getByRole('button', { name: '核实原操作', exact: true }).waitFor(); await page.getByRole('button', { name: '核实原操作', exact: true }).click({ timeout: 45000 }); await page.getByRole('button', { name: '核实原操作', exact: true }).waitFor({ state: 'hidden' }); }
     await page.getByRole('button', { name: '更新发布内容', exact: true }).waitFor({ timeout: 45000 });
